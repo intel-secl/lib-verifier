@@ -1,0 +1,3 @@
+TODO:
+1. Test with Hostmanifest instead of HostReport.
+2. Get HostManifest for all type Hosts/TPM Version.

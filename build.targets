@@ -1,0 +1,7 @@
+# A successful build produces the following files:
+verifier/target/lib-verifier-*-with-dependencies.jar
+verifier/target/lib-verifier-*-dependencies.zip
+verifier/target/lib-verifier-*.jar
+verifier/target/lib-verifier-*-javadoc.zip
+verifier-integration/target/verifier-integration-*.jar
+verifier-integration/target/verifier-integration-*-with-dependencies.jar
