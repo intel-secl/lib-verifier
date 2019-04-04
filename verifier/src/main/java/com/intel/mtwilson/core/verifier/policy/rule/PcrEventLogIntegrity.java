@@ -101,7 +101,6 @@ public class PcrEventLogIntegrity extends BaseRule {
         AbstractDigest result = bank == DigestAlgorithm.SHA256 ? new Sha256Digest(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) : Sha1Digest.ZERO;
         for (Measurement m : list) {
             log.debug("computeHistory: About to extend {} with {}.", result.toString(), m.getValue().toString());
-            //result = result.extend(m.getValue());
             if (bank == DigestAlgorithm.SHA256) {
                 result = ((Sha256Digest) result).extend(m.getValue().toByteArray());
             } else {

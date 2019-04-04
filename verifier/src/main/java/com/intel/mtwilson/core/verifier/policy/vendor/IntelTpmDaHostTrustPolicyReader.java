@@ -26,9 +26,6 @@ import static com.intel.mtwilson.core.flavor.common.FlavorPart.*;
 public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader {
 
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(IntelHostTrustPolicyReader.class);
-//    private final List<String> biosLogIncludesLabels = Arrays.asList("LCP_DETAILS_HASH", "BIOSAC_REG_DATA", "OSSINITDATA_CAP_HASH", "STM_HASH", "MLE_HASH", "NV_INFO_HASH", "tb_policy", "CPU_SCRTM_STAT", "HASH_START", "LCP_CONTROL_HASH");
-//    private final List<String> osLogIncludeLables = Arrays.asList("vmlinuz");
-//    private final List<String> hostUniqueLogIncludeLabels = Arrays.asList("initrd");
     private final Flavor flavor;
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
@@ -90,7 +87,6 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
         Set<Rule> pcrEventLogEqualsExcludingRules = VendorTrustPolicyRules.createPcrEventLogEqualsExcludingRules(flavor.getPcrs(), Arrays.asList(17, 18), TrustMarker.PLATFORM.name());
         rules.addAll(pcrEventLogEqualsExcludingRules);
 
-//        Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(removeLabels(flavor.getPcrs(), Arrays.asList(17, 18), biosLogIncludesLabels), Arrays.asList(17, 18), TrustMarker.PLATFORM.name());
         Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(17, 18), TrustMarker.PLATFORM.name());
         rules.addAll(pcrEventLogIntegrityRules);
 
@@ -120,7 +116,6 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
         Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(17), TrustMarker.OS.name());
         rules.addAll(pcrEventLogIntegrityRules);
 
-        //Set<Rule> pcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(removeLabels(flavor.getPcrs(), Arrays.asList(17), osLogIncludeLables), Arrays.asList(17), TrustMarker.OS.name());
         Set<Rule> pcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(17), TrustMarker.OS.name());
         rules.addAll(pcrEventLogIncludesRules);
 
@@ -147,7 +142,6 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
         rules.addAll(AikCertificateTrustedRule);
 
         // Verify Host Unique
-        //Set<Rule> PcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(removeLabels(flavor.getPcrs(), Arrays.asList(17, 18), hostUniqueLogIncludeLabels), Arrays.asList(17, 18), TrustMarker.HOST_UNIQUE.name());
         Set<Rule> PcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(17, 18), TrustMarker.HOST_UNIQUE.name());
         rules.addAll(PcrEventLogIncludesRules);
 
@@ -185,29 +179,4 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
 
         return rules;
     }
-
-    /**
-     *
-     *
-     * @param pcrList List of PCRs along with their the Digest Bank(Algorithm),
-     * value and events
-     * @param pcrIndexList List of PCR index required for rules creation
-     * @param eventLabels
-     * @return List of PCRs along with labels removed
-     */
-    /*
-    private Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> removeLabels(Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> pcrList, List<Integer> pcrIndexList, List<String> eventLabels) {
-        for (DigestAlgorithm pcrDigest : pcrList.keySet()) {
-            Map<PcrIndex, PcrEx> pcrs = pcrList.get(pcrDigest);
-            if (pcrs.isEmpty()) {
-                continue;
-            }
-            for (Integer index : pcrIndexList) {
-                PcrEx ex = pcrs.get(new PcrIndex(index));
-                ex.getEvent().removeIf((Measurement m) -> !eventLabels.contains(m.getLabel()));
-            }
-        }
-        return pcrList;
-    }
-    */
 }

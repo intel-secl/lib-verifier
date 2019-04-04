@@ -125,13 +125,7 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
      */
     private Set<Rule> loadTrustRulesForHostUnique() {
         HashSet<Rule> rules = new HashSet<>();
-
-        // Verify AIK Certificate
-        //Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(HOST_UNIQUE, privacyCaCertificatepath);
-        //rules.addAll(AikCertificateTrustedRule);
-
         log.debug("Created Trust rules for HOST_UNIQUE");
-
         return rules;
     }
 

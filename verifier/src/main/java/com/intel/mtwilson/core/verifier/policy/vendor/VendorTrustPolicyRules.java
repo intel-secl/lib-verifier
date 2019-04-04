@@ -63,7 +63,6 @@ public class VendorTrustPolicyRules {
         try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile(privacyCaCertificatepath))) {
             List<X509Certificate> privacyCaCerts = X509Util.decodePemCertificates(IOUtils.toString(privacyCaIn));
             pcaList.addAll(privacyCaCerts);
-            //IOUtils.closeQuietly(privacyCaIn);
             log.debug("Added {} certificates from PrivacyCA.list.pem", privacyCaCerts.size());
         } catch (Exception ex) {
             log.error("Cannot load PrivacyCA.list.pem", ex);
@@ -72,7 +71,6 @@ public class VendorTrustPolicyRules {
         try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile(privacyCaCertificatepath))) {
             X509Certificate privacyCaCert = X509Util.decodeDerCertificate(IOUtils.toByteArray(privacyCaIn));
             pcaList.add(privacyCaCert);
-            //IOUtils.closeQuietly(privacyCaIn);
             log.debug("Added certificate from PrivacyCA.pem");
         } catch (Exception ex) {
             log.error("Cannot load PrivacyCA.pem", ex);
@@ -135,9 +133,7 @@ public class VendorTrustPolicyRules {
     public static Set<Rule> createAssetTagMacthesRules(Flavor flavor){
         log.debug("Creating PcrEventLogIncludes");
         HashSet<Rule> rules = new HashSet<>();
-        //log.debug("Adding the asset tag rule for host {} with asset tag ID {}", tblHosts.getName(), atagCert.getId()); 
         byte[] atagCert = flavor.getExternal().getAssetTag().getTagCertificate().getEncoded();
-        //DigestAlgorithm digest = DigestAlgorithm.valueOf(flavor.getHostUniqueAssetTag().getDigestAlgorithm());
         Map<String, String> tags = new HashMap();
         for(UTF8NameValueMicroformat atr : flavor.getExternal().getAssetTag().getTagCertificate().getAttributes(UTF8NameValueMicroformat.class)){
             tags.put(atr.getName(), atr.getValue());

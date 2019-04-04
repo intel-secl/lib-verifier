@@ -70,15 +70,6 @@ public class Fault {
     }
     
     /**
-     * This method is present for the purpose of serializing the faults in a report.
-     * Normally the object mapper may not include class names so this method ensures
-     * the fault's class name is serialized. For subclasses this returns the name of
-     * the subclass.
-     * @return the class name of the fault
-     */
-    //public String getFaultName() { return getClass().getName(); }
-    
-    /**
      * This method allows the application to get additional information about 
      * the error or exception that caused the fault, if that was the case.
      * 
