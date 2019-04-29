@@ -11,9 +11,9 @@ import com.intel.mtwilson.core.verifier.policy.Policy;
 import com.intel.mtwilson.core.verifier.policy.Rule;
 import com.intel.mtwilson.core.verifier.policy.TrustMarker;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static com.intel.mtwilson.core.verifier.policy.utils.FlavorUtils.isTbootInstalled;
 
 import static com.intel.mtwilson.core.flavor.common.FlavorPart.*;
 
@@ -55,15 +55,18 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
             case ASSET_TAG:
                 trustrules.addAll(loadTrustRulesForAssetTag());
                 break;
+            case SOFTWARE:
+                trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
+                break;
         }
-
+       
         return new Policy("Intel Host Trust Policy", trustrules);
     }
 
     /**
      * Prepare Trust rules for PLATFORM Flavor
      *
-     * Rules:
+     * Rules: 
      * - AIK Verification
      * - PcrMatchesConstant rule for PCR 0
      * - PcrMatchesConstant rule for PCR 17
@@ -74,13 +77,13 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify AIK Certificate
-        Set<Rule> aikCertificateTrustedRules = VendorTrustPolicyRules.createAikCertificateTrustedRules(PLATFORM.getValue(), privacyCaCertificatepath);
+        Set<Rule> aikCertificateTrustedRules = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.PLATFORM.getValue(), privacyCaCertificatepath);
         rules.addAll(aikCertificateTrustedRules);
 
         // Verify PLATFORM
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0, 17), TrustMarker.PLATFORM.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0, 17), TrustMarker.PLATFORM.getValue());
         rules.addAll(pcrMatchesConstantRules);
-
+        
         log.debug("Created Trust rules for PLATFORM");
 
         return rules;
@@ -89,7 +92,7 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
     /**
      * Prepare Trust rules for OS Flavor
      *
-     * Rules:
+     * Rules: 
      * - AIK Verification
      * - PcrMatchesConstant rule for PCR 18
      *
@@ -99,13 +102,13 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify AIK Certificate
-        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(OS.getValue(), privacyCaCertificatepath);
+        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.OS.getValue(), privacyCaCertificatepath);
         rules.addAll(AikCertificateTrustedRule);
 
         // Verify OS
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(18), TrustMarker.OS.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(18), TrustMarker.OS.getValue());
         rules.addAll(pcrMatchesConstantRules);
-
+        
         log.debug("Created Trust rules for OS");
 
         return rules;
@@ -116,8 +119,8 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
      *
      * Rules:
      * - AIK Verification
-     * - PcrEventLogIncludes rule for PCR 19
-     * - PcrEventLogIntegrity rule for PCR 19
+     * - PcrEventLogIncludes rule for PCR 19 
+     * - PcrEventLogIntegrity rule for PCR 19 
      *
      * @return Set of rules
      */
@@ -125,16 +128,17 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify AIK Certificate
-        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(HOST_UNIQUE.getValue(), privacyCaCertificatepath);
+        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.HOST_UNIQUE.getValue(), privacyCaCertificatepath);
         rules.addAll(AikCertificateTrustedRule);
 
         // Verify Host Unique
-        Set<Rule> PcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.name());
+        Set<Rule> PcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.getValue());
         rules.addAll(PcrEventLogIncludesRules);
 
-        Set<Rule> PcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.name());
-        rules.addAll(PcrEventLogIntegrityRules);
-        
+        if(isTbootInstalled(flavor)) {
+            Set<Rule> PcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.getValue());
+            rules.addAll(PcrEventLogIntegrityRules);
+        }
         log.debug("Created Trust rules for HOST_UNIQUE");
         
         return rules;

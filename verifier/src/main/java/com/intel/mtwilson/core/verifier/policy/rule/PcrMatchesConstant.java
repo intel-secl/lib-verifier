@@ -23,7 +23,7 @@ import java.util.Objects;
  * The PcrMatchesConstant policy enforces that a specific PCR contains a specific 
  * pre-determined constant value. This is typical for values that are known in 
  * advance such as PLATFORM or trusted module measurements.
- *
+ * 
  * For example, "PCR {index} must equal {hex-value}"
  * 
  * @author dtiwari

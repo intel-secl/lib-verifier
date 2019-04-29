@@ -55,6 +55,9 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
             case ASSET_TAG:
                 trustrules.addAll(loadTrustRulesForAssetTag());
                 break;
+            case SOFTWARE:
+                trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
+                break;
         }
 
         return new Policy("Microsoft Host Trust Policy", trustrules);
@@ -63,7 +66,7 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
     /**
      * Prepare Trust rules for PLATFORM Flavor
      *
-     * Rules:
+     * Rules: 
      * - AIK Verification
      * - PcrMatchesConstant rule for PCR 0
      *
@@ -73,11 +76,11 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify AIK Certificate
-        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(PLATFORM.getValue(), privacyCaCertificatepath);
+        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.PLATFORM.getValue(), privacyCaCertificatepath);
         rules.addAll(AikCertificateTrustedRule);
 
         // Verify PLATFORM
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0), TrustMarker.PLATFORM.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0), TrustMarker.PLATFORM.getValue());
         rules.addAll(pcrMatchesConstantRules);
 
         log.debug("Created Trust rules for PLATFORM");
@@ -88,7 +91,7 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
     /**
      * Prepare Trust rules for OS Flavor
      *
-     * Rules:
+     * Rules: 
      * - AIK Verification
      * - PcrMatchesConstant rule for PCR 13
      * - PcrMatchesConstant rule for PCR 14
@@ -99,11 +102,11 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify AIK Certificate
-        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(OS.getValue(), privacyCaCertificatepath);
+        Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.OS.getValue(), privacyCaCertificatepath);
         rules.addAll(AikCertificateTrustedRule);
 
         // Verify OS
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(13, 14), TrustMarker.OS.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(13, 14), TrustMarker.OS.getValue());
         rules.addAll(pcrMatchesConstantRules);
 
         log.debug("Created Trust rules for OS");
@@ -114,18 +117,24 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
     /**
      * Prepare Trust rules for Host Unique Flavor
      *
-     * Note: Commented out the below rule as Windows don't support the
+     * Note: Commented out the below rule as Windows don't support the 
      * HostUnique flavor. Not removing the method or call to this method as this
      * will be a placeholder for future rules.
-     *
-     * Rules:
-     * - AIK Verification
+     * 
+     * Rules: 
+     * - AIK Verification 
      *
      * @return Set of rules
      */
     private Set<Rule> loadTrustRulesForHostUnique() {
         HashSet<Rule> rules = new HashSet<>();
+
+        // Verify AIK Certificate 
+        //Set<Rule> AikCertificateTrustedRule = VendorTrustPolicyRules.createAikCertificateTrustedRules(FlavorPart.HOST_UNIQUE.getValue(), privacyCaCertificatepath);
+        //rules.addAll(AikCertificateTrustedRule);
+
         log.debug("Created Trust rules for HOST_UNIQUE");
+
         return rules;
     }
 

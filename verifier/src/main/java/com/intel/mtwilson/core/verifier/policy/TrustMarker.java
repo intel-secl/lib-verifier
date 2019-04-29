@@ -10,8 +10,19 @@ package com.intel.mtwilson.core.verifier.policy;
  * @author dtiwari
  */
 public enum TrustMarker {
-    PLATFORM,
-    OS,
-    HOST_UNIQUE,
-    ASSET_TAG, 
+    PLATFORM("PLATFORM"),
+    OS("OS"),
+    HOST_UNIQUE("HOST_UNIQUE"),
+    ASSET_TAG("ASSET_TAG"),
+    SOFTWARE("SOFTWARE");
+
+    private String value;
+
+    TrustMarker(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

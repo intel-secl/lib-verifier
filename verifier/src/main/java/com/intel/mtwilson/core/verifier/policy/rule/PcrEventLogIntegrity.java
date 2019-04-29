@@ -12,18 +12,13 @@ import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
 import com.intel.dcsg.cpg.crypto.Sha1Digest;
 import com.intel.dcsg.cpg.crypto.Sha256Digest;
 
+import com.intel.mtwilson.core.common.model.*;
 import com.intel.mtwilson.core.verifier.policy.BaseRule;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogInvalid;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogMissing;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrManifestMissing;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrValueMissing;
-
-import com.intel.mtwilson.core.common.model.HostManifest;
-import com.intel.mtwilson.core.common.model.Measurement;
-import com.intel.mtwilson.core.common.model.Pcr;
-import com.intel.mtwilson.core.common.model.PcrEventLog;
-import com.intel.mtwilson.core.common.model.PcrIndex;
 
 import java.util.List;
 import java.util.Objects;
@@ -52,8 +47,8 @@ import java.util.Objects;
 public class PcrEventLogIntegrity extends BaseRule {
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PcrEventLogIntegrity.class);
     private DigestAlgorithm pcrBank;
-    private PcrIndex pcrIndex;
-    private Pcr expected;
+    protected PcrIndex pcrIndex;
+    protected Pcr expected;
 
     protected PcrEventLogIntegrity() {
     } // for desearializing jackson
@@ -101,6 +96,7 @@ public class PcrEventLogIntegrity extends BaseRule {
         AbstractDigest result = bank == DigestAlgorithm.SHA256 ? new Sha256Digest(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}) : Sha1Digest.ZERO;
         for (Measurement m : list) {
             log.debug("computeHistory: About to extend {} with {}.", result.toString(), m.getValue().toString());
+            //result = result.extend(m.getValue());
             if (bank == DigestAlgorithm.SHA256) {
                 result = ((Sha256Digest) result).extend(m.getValue().toByteArray());
             } else {

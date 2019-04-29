@@ -58,8 +58,10 @@ public class HostTrustPolicyManager {
             } else {
                 vendorKey = getVendorName(hostManifest.getHostInfo());
             }
+            log.debug("Selected Policy Reader:" + vendorKey);
             // get tpmVersion from flavor metadata's description, check hostManifest if it is null
-            if (flavor != null && flavor.getMeta() != null && flavor.getMeta().getDescription() != null) {
+            if (flavor != null && flavor.getMeta() != null && flavor.getMeta().getDescription() != null
+                    && flavor.getMeta().getDescription().getTpmVersion() != null) {
                 tpmVersion = flavor.getMeta().getDescription().getTpmVersion();
             } else {
                 tpmVersion = hostManifest.getHostInfo().getTpmVersion();
@@ -83,6 +85,7 @@ public class HostTrustPolicyManager {
         switch (hostInfo.getOsName().trim().toUpperCase()) {
             case "REDHATENTERPRISESERVER":
             case "RHEL":
+            case "UBUNTU":
                 vendor = "INTEL";
                 break;
             case "WINDOWS":

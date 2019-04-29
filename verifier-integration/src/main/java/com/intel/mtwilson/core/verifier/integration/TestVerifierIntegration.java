@@ -57,14 +57,14 @@ public class TestVerifierIntegration {
 
         PlatformFlavor platformFlavor = flavorFactory.getPlatformFlavor(hostManifest, tagCer);        
 
-        for(String flavorPart : platformFlavor.getFlavorPartNames()) {
+        for(String flavorPart: platformFlavor.getFlavorPartNames()) {
             String flavor = platformFlavor.getFlavorPart(flavorPart);
-            System.out.println("=== Generated Flavor ===");
+            System.out.println("=== Generated " + flavorPart + " Flavor ===");
             System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(flavor));
 
             Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem");
             TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, flavor);
-            System.out.println("=== Generated Trust Report ===");
+            System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
             System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
         }
     }

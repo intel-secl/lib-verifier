@@ -14,14 +14,7 @@ import com.intel.mtwilson.core.flavor.model.PcrEx;
 import com.intel.mtwilson.core.verifier.policy.BaseRule;
 import com.intel.mtwilson.core.verifier.policy.Rule;
 import com.intel.mtwilson.core.verifier.policy.TrustMarker;
-import com.intel.mtwilson.core.verifier.policy.rule.AssetTagMatches;
-import com.intel.mtwilson.core.verifier.policy.rule.AikCertificateTrusted;
-import com.intel.mtwilson.core.verifier.policy.rule.PcrEventLogEquals;
-import com.intel.mtwilson.core.verifier.policy.rule.PcrEventLogEqualsExcluding;
-import com.intel.mtwilson.core.verifier.policy.rule.PcrEventLogIncludes;
-import com.intel.mtwilson.core.verifier.policy.rule.PcrEventLogIntegrity;
-import com.intel.mtwilson.core.verifier.policy.rule.PcrMatchesConstant;
-import com.intel.mtwilson.core.verifier.policy.rule.TagCertificateTrusted;
+import com.intel.mtwilson.core.verifier.policy.rule.*;
 
 import com.intel.mtwilson.core.common.model.Measurement;
 import com.intel.mtwilson.core.common.model.PcrEventLogFactory;
@@ -41,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -51,7 +45,7 @@ import org.apache.commons.io.IOUtils;
 public class VendorTrustPolicyRules {
     
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VendorTrustPolicyRules.class);
-    
+    private static final String DUMMY_PCR256_DIGEST = "057367afa72d572655ab6fa21ac7ce7922fb364557f5225de70308c65d4e85d3";
     /**
      * Check AIK Certificate is signed by trusted Privacy CA
      *
@@ -63,6 +57,7 @@ public class VendorTrustPolicyRules {
         try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile(privacyCaCertificatepath))) {
             List<X509Certificate> privacyCaCerts = X509Util.decodePemCertificates(IOUtils.toString(privacyCaIn));
             pcaList.addAll(privacyCaCerts);
+            //IOUtils.closeQuietly(privacyCaIn);
             log.debug("Added {} certificates from PrivacyCA.list.pem", privacyCaCerts.size());
         } catch (Exception ex) {
             log.error("Cannot load PrivacyCA.list.pem", ex);
@@ -71,6 +66,7 @@ public class VendorTrustPolicyRules {
         try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile(privacyCaCertificatepath))) {
             X509Certificate privacyCaCert = X509Util.decodeDerCertificate(IOUtils.toByteArray(privacyCaIn));
             pcaList.add(privacyCaCert);
+            //IOUtils.closeQuietly(privacyCaIn);
             log.debug("Added certificate from PrivacyCA.pem");
         } catch (Exception ex) {
             log.error("Cannot load PrivacyCA.pem", ex);
@@ -133,7 +129,9 @@ public class VendorTrustPolicyRules {
     public static Set<Rule> createAssetTagMacthesRules(Flavor flavor){
         log.debug("Creating PcrEventLogIncludes");
         HashSet<Rule> rules = new HashSet<>();
+        //log.debug("Adding the asset tag rule for host {} with asset tag ID {}", tblHosts.getName(), atagCert.getId()); 
         byte[] atagCert = flavor.getExternal().getAssetTag().getTagCertificate().getEncoded();
+        //DigestAlgorithm digest = DigestAlgorithm.valueOf(flavor.getHostUniqueAssetTag().getDigestAlgorithm());
         Map<String, String> tags = new HashMap();
         for(UTF8NameValueMicroformat atr : flavor.getExternal().getAssetTag().getTagCertificate().getAttributes(UTF8NameValueMicroformat.class)){
             tags.put(atr.getName(), atr.getValue());
@@ -201,11 +199,39 @@ public class VendorTrustPolicyRules {
     }
     
     /**
+     * Create createSoftwareRules Trust rules
+     *
+     * @return  Set of createSoftwareRules Trust rules
+     * @param flavor
+     */
+    public static Set<Rule> createSoftwareRules(Flavor flavor){
+        log.debug("Creating PcrMatchesConstant");
+        HashSet<Rule> rules = new HashSet<>();
+        XmlMeasurementsDigestEquals xmlMeasurementsDigestEquals = new XmlMeasurementsDigestEquals(flavor);
+        xmlMeasurementsDigestEquals.setMarkers(TrustMarker.SOFTWARE.name());
+        rules.add(xmlMeasurementsDigestEquals);
+
+        // PCR value not getting validated hence sending dummy value
+        PcrEventLogIntegrity pcrEventLogIntegrity = new Pcr15EventLogIntegrity(flavor);
+        pcrEventLogIntegrity.setMarkers(TrustMarker.SOFTWARE.name());
+        rules.add(pcrEventLogIntegrity);
+
+        XmlMeasurementLogIntegrity xmlMeasurementLogIntegrity = new XmlMeasurementLogIntegrity(flavor);
+        xmlMeasurementLogIntegrity.setMarkers(TrustMarker.SOFTWARE.name());
+        rules.add(xmlMeasurementLogIntegrity);
+
+        XmlMeasurementLogEquals xmlMeasurementLogEquals = new XmlMeasurementLogEquals(flavor);
+        xmlMeasurementLogEquals.setMarkers(TrustMarker.SOFTWARE.name());
+        rules.add(xmlMeasurementLogEquals);
+        return rules;
+    }
+
+    /**
      * Create PcrMatchesConstant Trust rules
-     * 
+     *
      * @param pcrList  List of PCRs along with their the Digest Bank(Algorithm), value and events
      * @param pcrIndexList  List of PCR index required for rules creation
-     * @param markers  List of Trust Markers  
+     * @param markers  List of Trust Markers
      * @return  Set of PcrMatchesConstant Trust rules
      */
     public static Set<Rule> createPcrMatchesConstantRules(Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> pcrList, List<Integer> pcrIndexList, String... markers){

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.intel.mtwilson.core.common.model.Measurement;
 import com.intel.mtwilson.core.common.model.PcrEventLog;
 import com.intel.mtwilson.core.common.model.PcrEventLogFactory;
+import com.intel.mtwilson.core.common.model.PcrIndex;
 import com.intel.mtwilson.core.common.model.HostManifest;
 
 import java.util.ArrayList;

@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,4 +102,17 @@ public class RuleResult {
         return faults.isEmpty();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RuleResult that = (RuleResult) o;
+        return Objects.equals(getRuleName(), that.getRuleName())
+                && Objects.equals(flavorId, that.flavorId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRuleName());
+    }
 }

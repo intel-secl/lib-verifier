@@ -14,6 +14,7 @@ import com.intel.dcsg.cpg.extensions.Extensions;
 
 import com.intel.mtwilson.core.common.model.HostManifest;
 
+import com.intel.mtwilson.core.flavor.common.FlavorPart;
 import com.intel.mtwilson.jaxrs2.provider.JacksonObjectMapperProvider;
 
 import com.intel.mtwilson.core.verifier.Verifier;
@@ -51,7 +52,7 @@ public class TestVerifierEsxiHost {
     File tempPrivacyCA;
     File temptagCA;
     String hostManifestwithTagCertificateAsJson;
-    PlatformFlavor platformFlavor;
+    String assetTagFlavor;
 
     @BeforeClass
     public static void registerJacksonModules() {
@@ -87,8 +88,8 @@ public class TestVerifierEsxiHost {
         //hostManifest.setTagCertificate(tagCer);
         hostManifestwithTagCertificateAsJson = mapper.writeValueAsString(hostManifest);
 
-        PlatformFlavorFactory factory = new PlatformFlavorFactory();
-        platformFlavor = factory.getPlatformFlavor(hostManifest, tagCer);
+        ESXPlatformFlavor esxPlatformFlavor = new ESXPlatformFlavor(hostManifest, tagCer);
+        assetTagFlavor = esxPlatformFlavor.getFlavorPart(FlavorPart.ASSET_TAG.getValue());
     }
 
     @After
@@ -99,15 +100,12 @@ public class TestVerifierEsxiHost {
 
     @Test
     public void testTrustReportResults() throws Exception {
-        for(String flavorPart: platformFlavor.getFlavorPartNames()) {
-            Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath());
-            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, platformFlavor.getFlavorPart(flavorPart));
-
-            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
-
-            for (Entry<String, String> entry : report.getTags().entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-            }
+        Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath());
+        TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, assetTagFlavor);
+        
+        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
+        for(Entry<String, String> entry : report.getTags().entrySet()){
+            System.out.println(entry.getKey() + " " + entry.getValue());
         }
     }
 }

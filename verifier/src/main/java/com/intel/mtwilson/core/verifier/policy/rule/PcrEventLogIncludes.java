@@ -72,6 +72,8 @@ public class PcrEventLogIncludes extends BaseRule {
     @Override
     public RuleResult apply(HostManifest hostManifest) {
         RuleResult report = new RuleResult(this);
+//        report.check(this);
+//        report.check(getClass().getSimpleName()); // the minimum... show that the host was evaluated by this policy
         if (hostManifest.getPcrManifest() == null) {
             report.fault(new PcrEventLogMissing());
         } else {

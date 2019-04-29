@@ -53,8 +53,11 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
             case ASSET_TAG:
                 trustrules.addAll(loadTrustRulesForAssetTag());
                 break;
+            case SOFTWARE:
+                trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
+                break;
         }
-
+        
         return new Policy("VMware Host Trust Policy", trustrules);
     }
 
@@ -71,7 +74,7 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify PLATFORM
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0, 17), TrustMarker.PLATFORM.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(0, 17), TrustMarker.PLATFORM.getValue());
         rules.addAll(pcrMatchesConstantRules);
 
         log.debug("Created Trust rules for PLATFORM");
@@ -82,7 +85,7 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
     /**
      * Prepare Trust rules for OS Flavor
      *
-     * Rules:
+     * Rules: 
      * - PcrMatchesConstant rule for PCR 18
      * - PcrMatchesConstant rule for PCR 20
      * - PcrEventLogEqualsExcluding rule for PCR 19
@@ -94,15 +97,15 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify OS
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(18, 20), TrustMarker.OS.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(18, 20), TrustMarker.OS.getValue());
         rules.addAll(pcrMatchesConstantRules);
 
-        Set<Rule> pcrEventLogEqualsExcludingRules = VendorTrustPolicyRules.createPcrEventLogEqualsExcludingRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.OS.name());
+        Set<Rule> pcrEventLogEqualsExcludingRules = VendorTrustPolicyRules.createPcrEventLogEqualsExcludingRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.OS.getValue());
         rules.addAll(pcrEventLogEqualsExcludingRules);
-
-        Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.OS.name());
+        
+        Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.OS.getValue());
         rules.addAll(pcrEventLogIntegrityRules);
-
+        
         log.debug("Created Trust rules for OS");
 
         return rules;
@@ -121,21 +124,21 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
         HashSet<Rule> rules = new HashSet<>();
 
         // Verify Host Unique
-        Set<Rule> pcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.name());
+        Set<Rule> pcrEventLogIncludesRules = VendorTrustPolicyRules.createPcrEventLogIncludesRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.getValue());
         rules.addAll(pcrEventLogIncludesRules);
-
-        Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.name());
+        
+        Set<Rule> pcrEventLogIntegrityRules = VendorTrustPolicyRules.createPcrEventLogIntegrityRules(flavor.getPcrs(), Arrays.asList(19), TrustMarker.HOST_UNIQUE.getValue());
         rules.addAll(pcrEventLogIntegrityRules);
-
+        
         log.debug("Created Trust rules for HOST_UNIQUE");
 
         return rules;
     }
-
+    
     /**
      * Prepare trust rules for Asset Tag
      *
-     * Rules:
+     * Rules: 
      * - TagCertificateTrusted rule
      * - PcrMatchesConstant rule for PCR 22
      *
@@ -146,12 +149,12 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
 
         if (flavor.getExternal() == null)
             return rules;
-
+        
         // Verify Asset Tag
         Set<Rule> tagCertificateTrustedRules = VendorTrustPolicyRules.createTagCertificateTrustedRules(flavor, assetTagCaCertificatepath);
         rules.addAll(tagCertificateTrustedRules);
 
-        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(22), TrustMarker.ASSET_TAG.name());
+        Set<Rule> pcrMatchesConstantRules = VendorTrustPolicyRules.createPcrMatchesConstantRules(flavor.getPcrs(), Arrays.asList(22), TrustMarker.ASSET_TAG.getValue());
         rules.addAll(pcrMatchesConstantRules);
         
         log.debug("Created Trust rules for ASSET_TAG");

@@ -72,6 +72,7 @@ public class PcrEventLogEquals extends BaseRule {
                     // we check that for the PCR defined in the policy, the HostManifest's PcrModuleManifest contains the exact set of expected modules
                     ArrayList<Measurement> hostActualUnexpected = new ArrayList<>(moduleManifest);
                     hostActualUnexpected.removeAll(expected.getEventLog()); //  hostActualUnexpected = actual modules - expected modules = only extra modules that shouldn't be there;  comparison is done BY HASH VALUE,  not by name or any "other info"
+                    hostActualUnexpected.removeAll(getPcrEventLogToBeIgnored(moduleManifest));
                     if (!hostActualUnexpected.isEmpty()) {
                         log.debug("PcrEventLogEquals : Host is having #{} additional modules compared to the white list.", hostActualUnexpected.size());
                         report.fault(new PcrEventLogContainsUnexpectedEntries(expected.getPcrIndex(), hostActualUnexpected));
@@ -86,6 +87,16 @@ public class PcrEventLogEquals extends BaseRule {
             }
         }
         return report;
+    }
+
+    private ArrayList<Measurement> getPcrEventLogToBeIgnored(List<Measurement> moduleManifest) {
+        ArrayList<Measurement> measurementsToBeIgnored = new ArrayList<>();
+        for(Measurement m : moduleManifest) {
+            if(m.getLabel().equalsIgnoreCase("0x4fe")) {
+                measurementsToBeIgnored.add(m);
+            }
+        }
+        return measurementsToBeIgnored;
     }
 
     protected PcrEventLog getPcrEventLog(HostManifest hostManifest) {

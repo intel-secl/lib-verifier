@@ -106,8 +106,8 @@ public class TrustReport {
     public boolean checkResultExists(RuleResult result) {
         String marker = result.getRule().getMarkers()[0];
         List<RuleResult> combinedRuleResults = this.getResultsForMarker(marker);
-        for (RuleResult combinedResult : combinedRuleResults) {
-            if (result.equals(combinedResult)) {
+        for (RuleResult ruleResult : combinedRuleResults) {
+            if (result.equals(ruleResult)) {
                 return true;
             }
         }
