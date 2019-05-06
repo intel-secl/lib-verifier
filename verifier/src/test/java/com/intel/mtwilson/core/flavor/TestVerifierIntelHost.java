@@ -112,7 +112,7 @@ public class TestVerifierIntelHost {
     public void testTrustReportResults() throws Exception {
         for(String flavorPart: gpf.getFlavorPartNames()) {
             Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath());
-            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, gpf.getFlavorPart(flavorPart));
+            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, gpf.getFlavorPart(flavorPart).get(0));
 
             System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
 

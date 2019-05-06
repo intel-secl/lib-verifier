@@ -89,7 +89,7 @@ public class TestVerifierEsxiHost {
         hostManifestwithTagCertificateAsJson = mapper.writeValueAsString(hostManifest);
 
         ESXPlatformFlavor esxPlatformFlavor = new ESXPlatformFlavor(hostManifest, tagCer);
-        assetTagFlavor = esxPlatformFlavor.getFlavorPart(FlavorPart.ASSET_TAG.getValue());
+        assetTagFlavor = esxPlatformFlavor.getFlavorPart(FlavorPart.ASSET_TAG.getValue()).get(0);
     }
 
     @After
