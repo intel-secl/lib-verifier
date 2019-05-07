@@ -6,8 +6,7 @@ import com.intel.wml.measurement.xml.Measurement;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import static com.intel.mtwilson.core.flavor.SoftwareFlavor.DEFAULT_APPLICATION_FLAVOR_PREFIX;
-import static com.intel.mtwilson.core.flavor.SoftwareFlavor.DEFAULT_WORKLOAD_FLAVOR_PREFIX;
+import com.intel.mtwilson.core.common.model.SoftwareFlavorPrefix;
 
 public class HostManifestUtils {
     public static boolean isMeasurementMissing(HostManifest hostManifest) {
@@ -21,7 +20,8 @@ public class HostManifestUtils {
             if(measurement.getUuid().equals(flavorId)) {
                 return measurement;
             }
-            if((flavorLabel.startsWith(DEFAULT_APPLICATION_FLAVOR_PREFIX) || flavorLabel.startsWith(DEFAULT_WORKLOAD_FLAVOR_PREFIX))
+            if((flavorLabel.contains(SoftwareFlavorPrefix.DEFAULT_APPLICATION_FLAVOR_PREFIX.getValue())
+                    || flavorLabel.contains(SoftwareFlavorPrefix.DEFAULT_WORKLOAD_FLAVOR_PREFIX.getValue()))
                     && measurement.getLabel().equals(flavorLabel)) {
                 return measurement;
             }

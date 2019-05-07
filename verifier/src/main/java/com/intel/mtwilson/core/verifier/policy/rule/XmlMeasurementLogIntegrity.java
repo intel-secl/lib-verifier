@@ -33,9 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.intel.mtwilson.core.flavor.SoftwareFlavor.DEFAULT_APPLICATION_FLAVOR_PREFIX;
-import static com.intel.mtwilson.core.flavor.SoftwareFlavor.DEFAULT_WORKLOAD_FLAVOR_PREFIX;
+import com.intel.mtwilson.core.common.model.SoftwareFlavorPrefix;
 
 
 /**
@@ -165,7 +163,8 @@ public class XmlMeasurementLogIntegrity extends BaseRule {
             if(flavorIdExistsInEventName(flavorId, measurement)) {
                 return measurement.getValue();
             }
-            if((flavorLabel.startsWith(DEFAULT_APPLICATION_FLAVOR_PREFIX) || flavorLabel.startsWith(DEFAULT_WORKLOAD_FLAVOR_PREFIX))
+            if((flavorLabel.contains(SoftwareFlavorPrefix.DEFAULT_APPLICATION_FLAVOR_PREFIX.getValue()) 
+                    || flavorLabel.contains(SoftwareFlavorPrefix.DEFAULT_WORKLOAD_FLAVOR_PREFIX.getValue()))
                     && flavorLabelExistsInEventName(flavorLabel, measurement)) {
                 return measurement.getValue();
             }
