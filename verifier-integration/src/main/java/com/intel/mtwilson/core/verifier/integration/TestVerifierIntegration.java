@@ -24,6 +24,7 @@ import java.io.IOException;
 import com.intel.mtwilson.core.verifier.Verifier;
 import com.intel.mtwilson.core.verifier.policy.TrustReport;
 import com.intel.mtwilson.core.common.tag.model.X509AttributeCertificate;
+import java.util.List;
 
 /**
  *
@@ -58,14 +59,16 @@ public class TestVerifierIntegration {
         PlatformFlavor platformFlavor = flavorFactory.getPlatformFlavor(hostManifest, tagCer);        
 
         for(String flavorPart: platformFlavor.getFlavorPartNames()) {
-            String flavor = platformFlavor.getFlavorPart(flavorPart);
-            System.out.println("=== Generated " + flavorPart + " Flavor ===");
-            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(flavor));
+            List<String> flavors = platformFlavor.getFlavorPart(flavorPart);
+            for (String flavor : flavors) {
+                System.out.println("=== Generated " + flavorPart + " Flavor ===");
+                System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(flavor));
 
-            Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem");
-            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, flavor);
-            System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
-            System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
+                Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem");
+                TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, flavor);
+                System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
+                System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
+            }            
         }
     }
     
