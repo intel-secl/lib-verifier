@@ -5,7 +5,7 @@
 package com.intel.mtwilson.core.verifier.policy.vendor;
 
 import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
-import com.intel.dcsg.cpg.crypto.Sha256Digest;
+import com.intel.dcsg.cpg.crypto.Sha384Digest;
 import com.intel.dcsg.cpg.x509.X509Util;
 
 import com.intel.mtwilson.core.flavor.model.Flavor;
@@ -139,7 +139,7 @@ public class VendorTrustPolicyRules {
         for(UTF8NameValueSequence atr : flavor.getExternal().getAssetTag().getTagCertificate().getAttributes(UTF8NameValueSequence.class)){
             tags.put(atr.getName(), atr.getValues().get(0));
         }
-        AssetTagMatches tagRule = new AssetTagMatches(Sha256Digest.digestOf(atagCert).toByteArray(), tags);
+        AssetTagMatches tagRule = new AssetTagMatches(Sha384Digest.digestOf(atagCert).toByteArray(), tags);
         tagRule.setMarkers(TrustMarker.ASSET_TAG.name());
         rules.add(tagRule);
         return rules;
