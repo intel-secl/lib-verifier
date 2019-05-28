@@ -10,6 +10,7 @@ import com.intel.dcsg.cpg.crypto.AbstractDigest;
 import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
 import com.intel.dcsg.cpg.crypto.Sha1Digest;
 import com.intel.dcsg.cpg.crypto.Sha256Digest;
+import com.intel.dcsg.cpg.crypto.Sha384Digest;
 import com.intel.mtwilson.core.common.model.HostManifest;
 import com.intel.mtwilson.core.common.model.Measurement;
 import com.intel.mtwilson.core.common.model.PcrEventLog;
@@ -93,9 +94,9 @@ public class XmlMeasurementLogIntegrity extends BaseRule {
                 List<MeasurementType> measurements = measurement.getMeasurements();
                 log.debug("XmlMeasurementLogIntegrity: Retrieved #{} of measurements from the log.", measurements.size());
                 if (measurements.size() > 0) {
-                    DigestAlgorithm finalDigestAlgorithm = DigestAlgorithm.SHA256;
-                    AbstractDigest expectedValueDigest = Sha256Digest.valueOfHex(expectedValue);
-                    AbstractDigest actualDigestInMeasurement = Sha256Digest.valueOfHex(measurement.getCumulativeHash().getValue());
+                    DigestAlgorithm finalDigestAlgorithm = DigestAlgorithm.SHA384;
+                    AbstractDigest expectedValueDigest = Sha384Digest.valueOfHex(expectedValue);
+                    AbstractDigest actualDigestInMeasurement = Sha384Digest.valueOfHex(measurement.getCumulativeHash().getValue());
                     AbstractDigest actualValue = computeHistory(measurements);
 
                     try {
@@ -141,12 +142,12 @@ public class XmlMeasurementLogIntegrity extends BaseRule {
         return expectedValueDigest.equals(actualDigestInEventLog);
     }
 
-    private Sha256Digest computeHistory(List<MeasurementType> list) {
-        Sha256Digest result = Sha256Digest.ZERO;
+    private Sha384Digest computeHistory(List<MeasurementType> list) {
+        Sha384Digest result = Sha384Digest.ZERO;
         for (MeasurementType m : list) {
             if (m.getValue() != null) {
                 log.debug("XmlMeasurementLogIntegrity-computeHistory: Extending value [{}] to current value [{}]", m.getValue(), result.toString());
-                result = result.extend(Sha256Digest.valueOfHex(m.getValue()));
+                result = result.extend(Sha384Digest.valueOfHex(m.getValue()));
             }
         }
         return result;
@@ -191,7 +192,7 @@ public class XmlMeasurementLogIntegrity extends BaseRule {
     private DigestAlgorithm getDigestAlgorithmFromTpmVersion(String tpmVersion) {
         DigestAlgorithm digestAlgorithm = DigestAlgorithm.SHA1;
         if (tpmVersion != null && tpmVersion.equals("2.0")) {
-            digestAlgorithm = DigestAlgorithm.SHA256;
+            digestAlgorithm = DigestAlgorithm.SHA384;
         }
         return digestAlgorithm;
     }

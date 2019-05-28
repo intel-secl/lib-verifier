@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.intel.dcsg.cpg.crypto.AbstractDigest;
 import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
-import com.intel.dcsg.cpg.crypto.Sha256Digest;
+import com.intel.dcsg.cpg.crypto.Sha384Digest;
 import com.intel.mtwilson.core.verifier.policy.Fault;
 
 
@@ -25,7 +25,7 @@ import com.intel.mtwilson.core.verifier.policy.Fault;
               include = JsonTypeInfo.As.PROPERTY,
               property = "digest_type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = XmlMeasurementValueMismatchSha256.class)
+        @JsonSubTypes.Type(value = XmlMeasurementValueMismatchSha384.class)
 })
 public abstract class XmlMeasurementValueMismatch<T extends AbstractDigest> extends Fault {
     private T expectedValue;
@@ -41,8 +41,8 @@ public abstract class XmlMeasurementValueMismatch<T extends AbstractDigest> exte
 
     public static XmlMeasurementValueMismatch newInstance(DigestAlgorithm bank, AbstractDigest expectedValue, AbstractDigest actualValue) {
         switch(bank) {
-            case SHA256:
-                return new XmlMeasurementValueMismatchSha256((Sha256Digest)expectedValue, (Sha256Digest)actualValue);
+            case SHA384:
+                return new XmlMeasurementValueMismatchSha384((Sha384Digest)expectedValue, (Sha384Digest)actualValue);
             default:
                 throw new UnsupportedOperationException("Not supported yet");
         }
