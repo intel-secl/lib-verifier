@@ -1,5 +1,5 @@
-# Intel<sup>®</sup> Security Libraries for Data Center  - Flavor Library
-#### This library is responsible for extracting the whitelist measurements from the host, which is being used a good known host for verifying against other target systems with similar configuration. These measurements correspond to specific system components and are used as the basis of comparison to generate trust attestations. There are multiple types of flavor including PLATFORM, OS, ASSET_TAG and HOST_UNIQUE.
+# Intel<sup>®</sup> Security Libraries for Data Center  - Verifier Library
+#### This library validates host reports against a previously defined and provided flavor.
 
 ## Key features
 - Provides interface to verify information retrieved from host against good known configuration collected using `Flavor Library`
