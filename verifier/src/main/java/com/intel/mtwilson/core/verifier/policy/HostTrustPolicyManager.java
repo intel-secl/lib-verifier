@@ -90,6 +90,7 @@ public class HostTrustPolicyManager {
                 break;
             case "WINDOWS":
             case "MICROSOFT WINDOWS SERVER 2016 DATACENTER":
+            case "MICROSOFT WINDOWS SERVER 2016 STANDARD":
                 vendor = "MICROSOFT";
                 break;
             case "VMWARE ESXI":
