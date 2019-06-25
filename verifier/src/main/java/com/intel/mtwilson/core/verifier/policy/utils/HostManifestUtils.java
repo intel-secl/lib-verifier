@@ -10,12 +10,12 @@ import com.intel.mtwilson.core.common.model.SoftwareFlavorPrefix;
 
 public class HostManifestUtils {
     public static boolean isMeasurementMissing(HostManifest hostManifest) {
-        return (hostManifest.getPcrManifest() == null || hostManifest.getPcrManifest().getMeasurementXmls() == null
-                || hostManifest.getPcrManifest().getMeasurementXmls().isEmpty());
+        return (hostManifest.getPcrManifest() == null || hostManifest.getMeasurementXmls() == null
+                || hostManifest.getMeasurementXmls().isEmpty());
     }
 
     public static Measurement getMeasurementAssociatedWithFlavor(String flavorId, String flavorLabel, HostManifest hostManifest) throws JAXBException, IOException, XMLStreamException {
-        for(String measurementXml : hostManifest.getPcrManifest().getMeasurementXmls()) {
+        for(String measurementXml : hostManifest.getMeasurementXmls()) {
             Measurement measurement = MeasurementUtils.parseMeasurementXML(measurementXml);
             if(measurement.getUuid().equals(flavorId)) {
                 return measurement;

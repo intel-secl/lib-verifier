@@ -143,7 +143,7 @@ public class TestVerifierIntelHost {
         PcrEventLog pcrEventLog = new PcrEventLogSha256(PcrIndex.PCR15, moduleManifest);
         p.setPcrEventLog(pcrEventLog);
 
-        p.setMeasurementXmls(measurements);
+        hostManifest.setMeasurementXmls(measurements);
         hostManifest.setPcrManifest(p);
 
 

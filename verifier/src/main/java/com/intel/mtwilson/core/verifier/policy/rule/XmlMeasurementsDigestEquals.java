@@ -60,7 +60,7 @@ public class XmlMeasurementsDigestEquals extends BaseRule {
                 DigestAlgorithm pcrDigestAlg = expected.getMeta().getDescription().getDigestAlgorithm();
                 String digestAlgorithm = pcrDigestAlg.name();
                 boolean faultsFound = false;
-                for(String measurementXml : hostManifest.getPcrManifest().getMeasurementXmls()) {
+                for(String measurementXml : hostManifest.getMeasurementXmls()) {
                     Measurement measurement = MeasurementUtils.parseMeasurementXML(measurementXml);
                     if(!digestAlgorithm.equals(measurement.getDigestAlg())) {
                         faultsFound = true;
