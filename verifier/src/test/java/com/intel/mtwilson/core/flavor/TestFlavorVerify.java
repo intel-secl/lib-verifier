@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2019 Intel Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 package com.intel.mtwilson.core.flavor;
 
@@ -11,12 +10,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.intel.dcsg.cpg.extensions.Extensions;
-import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.TrustReport;
 import com.intel.mtwilson.jackson.bouncycastle.BouncyCastleModule;
 import com.intel.mtwilson.jackson.validation.ValidationModule;
 import com.intel.mtwilson.jaxrs2.provider.JacksonObjectMapperProvider;
-import java.io.File;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

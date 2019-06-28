@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2018 Intel Corporation
- * All rights reserved.
+ * Copyright (C) 2019 Intel Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 package com.intel.mtwilson.core.verifier.policy.rule;
 
@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * The XmlMeasurementsDigestEquals policy enforces that a Digest Algorithm specified in

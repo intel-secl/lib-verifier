@@ -1,7 +1,7 @@
 /*
- *  * Copyright (C) 2018 Intel Corporation
- *   * All rights reserved.
- *    */
+ * Copyright (C) 2019 Intel Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 package com.intel.mtwilson.core.verifier.policy.fault;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
