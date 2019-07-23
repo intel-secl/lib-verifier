@@ -4,6 +4,9 @@
  */
 package com.intel.mtwilson.core.verifier;
 
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
+import com.intel.mtwilson.core.verifier.policy.utils.FlavorUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intel.mtwilson.jaxrs2.provider.JacksonObjectMapperProvider;
 
@@ -53,26 +56,24 @@ public class Verifier {
      * @return  TrustReport
      * @throws IOException
      */
-    public TrustReport verify(String hostManifest, String flavor) throws IOException {
+    public TrustReport verify(String hostManifest, String flavor, String signature) throws IOException {
         ObjectMapper mapper = JacksonObjectMapperProvider.createDefaultMapper();
         HostManifest hostManifestObj = mapper.readValue(hostManifest, HostManifest.class);
-        Flavor flavorObj = mapper.readValue(flavor, Flavor.class);
-        return verify(hostManifestObj, flavorObj);
+        return verify(hostManifestObj, new SignedFlavor(mapper.readValue(flavor, Flavor.class), signature));
     }
     
     /**
      * Generate the Trust Report for the given Host Manifest and Flavor
      * 
-     * @param hostManifest  Host Manifest 
-     * @param flavor  Flavor
+     * @param hostManifest       Host Manifest
+     * @param signedFlavor Flavor With Signature
      * @return  TrustReport
      */
-    public TrustReport verify(HostManifest hostManifest, Flavor flavor) {
-        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(flavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath);
+    public TrustReport verify(HostManifest hostManifest, SignedFlavor signedFlavor) {
+        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(signedFlavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath);
         VendorTrustPolicyReader trustpolicy = policymanager.getVendorTrustPolicyReader();
-        //log.debug("PolicyEngine.apply policy {}", policy.getName());
         Policy policy = trustpolicy.loadTrustRules();
-        return applyPolicy(hostManifest, policy, flavor.getMeta().getId());
+        return applyPolicy(hostManifest, policy, signedFlavor.getFlavor().getMeta().getId());
     }
     
     /**
@@ -101,7 +102,7 @@ public class Verifier {
      * Given a set of rules, apply them all, and combine the results into one report.
      * 
      * @param  hostManifest  
-     * @param  Set of rules to be applied   
+     * @param  rules to be applied
      * @return  Generated TrustReport
      */
     private List<RuleResult> applyTrustRules(HostManifest hostManifest, Set<Rule> rules) {

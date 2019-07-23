@@ -5,6 +5,7 @@
 package com.intel.mtwilson.core.verifier.policy.vendor;
 
 import com.intel.mtwilson.core.flavor.model.Flavor;
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,14 @@ public class TrustRulesHolder {
         Set<Rule> softwareRules = VendorTrustPolicyRules.createSoftwareRules(flavor);
         rules.addAll(softwareRules);
         log.debug("Created Trust rules for SOFTWARE");
+        return rules;
+    }
+
+    public static Set<Rule> loadFlavorIntegrityTrustRules(SignedFlavor flavorAndSignature, String flavorType) {
+        HashSet<Rule> rules = new HashSet<>();
+        Set<Rule> flavorIntegrityRules = VendorTrustPolicyRules.createFlavorIntegrityRules(flavorAndSignature, flavorType);
+        rules.addAll(flavorIntegrityRules);
+        log.debug("Created Trust rules for FLAVOR_INTEGRITY");
         return rules;
     }
 }

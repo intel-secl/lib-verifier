@@ -10,6 +10,7 @@ import com.intel.mtwilson.core.flavor.common.FlavorPart;
 import com.intel.mtwilson.core.flavor.model.Flavor;
 
 import com.intel.mtwilson.core.flavor.model.PcrEx;
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.Policy;
 import com.intel.mtwilson.core.verifier.policy.Rule;
 import com.intel.mtwilson.core.verifier.policy.TrustMarker;
@@ -35,11 +36,13 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
     private final Flavor flavor;
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
+    private final SignedFlavor flavorAndSignature;
 
-    public IntelTpmDaHostTrustPolicyReader(Flavor flavor, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavor = flavor;
+    public IntelTpmDaHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
+        this.flavor = flavorAndSignature.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
+        this.flavorAndSignature = flavorAndSignature;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
                 trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
                 break;
         }
-
+        trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(flavorAndSignature, flavortype));
         return new Policy("Intel Host Trust Policy", trustrules);
     }
 
@@ -201,30 +204,6 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
         return rules;
     }
 
-    /**
-     *
-     *
-     * @param pcrList List of PCRs along with their the Digest Bank(Algorithm),
-     * value and events
-     * @param pcrIndexList List of PCR index required for rules creation
-     * @param eventLabels
-     * @return List of PCRs along with labels removed
-     */
-    /*
-    private Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> removeLabels(Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> pcrList, List<Integer> pcrIndexList, List<String> eventLabels) {
-        for (DigestAlgorithm pcrDigest : pcrList.keySet()) {
-            Map<PcrIndex, PcrEx> pcrs = pcrList.get(pcrDigest);
-            if (pcrs.isEmpty()) {
-                continue;
-            }
-            for (Integer index : pcrIndexList) {
-                PcrEx ex = pcrs.get(new PcrIndex(index));
-                ex.getEvent().removeIf((Measurement m) -> !eventLabels.contains(m.getLabel()));
-            }
-        }
-        return pcrList;
-    }
-    */
     private static List<Integer> getCbntPcrs(Flavor flavor) {
         List<Integer> cbntPcrs = new ArrayList<>();
         if(flavor.getHardware().getFeature().getCBNT() != null &&

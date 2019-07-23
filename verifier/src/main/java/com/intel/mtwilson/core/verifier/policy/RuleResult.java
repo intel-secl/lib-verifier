@@ -49,7 +49,7 @@ public class RuleResult {
         this.flavorId = flavorId;
     }
 
-    private RuleResult() {
+    public RuleResult() {
         this.rule = null;
     } // for json deserialization support only
 

@@ -6,6 +6,7 @@ package com.intel.mtwilson.core.verifier.policy.vendor;
 
 import com.intel.mtwilson.core.flavor.common.FlavorPart;
 import com.intel.mtwilson.core.flavor.model.Flavor;
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.Policy;
 
 import com.intel.mtwilson.core.verifier.policy.Rule;
@@ -29,11 +30,13 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
     private final Flavor flavor;
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
+    private final SignedFlavor flavorAndSignature;
 
-    public MicrosoftHostTrustPolicyReader(Flavor flavor, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavor = flavor;
+    public MicrosoftHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
+        this.flavor = flavorAndSignature.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
+        this.flavorAndSignature = flavorAndSignature;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
                 trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
                 break;
         }
-
+        trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(flavorAndSignature, flavortype));
         return new Policy("Microsoft Host Trust Policy", trustrules);
     }
 

@@ -11,8 +11,10 @@ import com.intel.dcsg.cpg.x509.X509Util;
 import com.intel.mtwilson.core.flavor.model.Flavor;
 import com.intel.mtwilson.core.flavor.model.PcrEx;
 
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.BaseRule;
 import com.intel.mtwilson.core.verifier.policy.Rule;
+import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.TrustMarker;
 import com.intel.mtwilson.core.verifier.policy.rule.*;
 
@@ -237,6 +239,15 @@ public class VendorTrustPolicyRules {
     public static Set<Rule> createPcrMatchesConstantRules(Map<DigestAlgorithm, Map<PcrIndex, PcrEx>> pcrList, List<Integer> pcrIndexList, String... markers){
         log.debug("Creating PcrMatchesConstant");
         return createRulesFromPcrList("PcrMatchesConstant", pcrList, pcrIndexList, markers);
+    }
+
+    public static Set<Rule> createFlavorIntegrityRules(SignedFlavor flavorAndSignature, String flavorType) {
+        log.debug("Creating Flavor Integrity trust rules");
+        HashSet<Rule> rules = new HashSet<>();
+        FlavorTrusted flavorTrusted = new FlavorTrusted(flavorAndSignature);
+        flavorTrusted.setMarkers(flavorType);
+        rules.add(flavorTrusted);
+        return rules;
     }
     
     /**

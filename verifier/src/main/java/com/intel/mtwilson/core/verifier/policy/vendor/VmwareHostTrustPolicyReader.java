@@ -6,6 +6,7 @@ package com.intel.mtwilson.core.verifier.policy.vendor;
 
 import com.intel.mtwilson.core.flavor.common.FlavorPart;
 import com.intel.mtwilson.core.flavor.model.Flavor;
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.Policy;
 
 import com.intel.mtwilson.core.verifier.policy.Rule;
@@ -27,11 +28,14 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
     protected final Flavor flavor;
     protected final String privacyCaCertificatepath; //TODO(dtiwari): Remove this variable as it is not being used like other Vendors ?
     protected final String assetTagCaCertificatepath;
+    private final SignedFlavor flavorAndSignature;
 
-    public VmwareHostTrustPolicyReader(Flavor flavor, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavor = flavor;
+
+    public VmwareHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
+        this.flavor = flavorAndSignature.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
+        this.flavorAndSignature = flavorAndSignature;
     }
 
     @Override
@@ -57,7 +61,7 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
                 trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
                 break;
         }
-        
+        trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(flavorAndSignature, flavortype));
         return new Policy("VMware Host Trust Policy", trustrules);
     }
 
