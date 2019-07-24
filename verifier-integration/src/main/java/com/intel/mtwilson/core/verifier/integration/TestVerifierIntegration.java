@@ -14,6 +14,7 @@ import com.intel.kunit.annotations.BeforeAll;
 import com.intel.kunit.annotations.Integration;
 import com.intel.mtwilson.core.flavor.PlatformFlavor;
 import com.intel.mtwilson.core.flavor.PlatformFlavorFactory;
+import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.host.connector.*;
 import com.intel.mtwilson.core.host.connector.intel.IntelHostConnectorFactory;
 import com.intel.mtwilson.core.host.connector.intel.MicrosoftHostConnectorFactory;
@@ -52,20 +53,19 @@ public class TestVerifierIntegration {
         HostConnector hostConnector = factory.getHostConnector(hostConnectionString, tlsPolicy);
         HostManifest hostManifest = hostConnector.getHostManifest();
         ObjectMapper mapper = JacksonObjectMapperProvider.createDefaultMapper();
-        String hostManifestwithTagCertificateAsJson = mapper.writeValueAsString(hostManifest);
         String tagCerAsJson = Resources.toString(Resources.getResource("tagcer.json"), Charsets.UTF_8);
         X509AttributeCertificate tagCer = mapper.readValue(tagCerAsJson, X509AttributeCertificate.class);
 
-        PlatformFlavor platformFlavor = flavorFactory.getPlatformFlavor(hostManifest, tagCer);        
+        PlatformFlavor platformFlavor = flavorFactory.getPlatformFlavor(hostManifest, tagCer);
 
         for(String flavorPart: platformFlavor.getFlavorPartNames()) {
-            List<String> flavors = platformFlavor.getFlavorPart(flavorPart);
-            for (String flavor : flavors) {
+            List<SignedFlavor> signedFlavorsList = platformFlavor.getFlavorPartWithSignature(flavorPart);
+            for (SignedFlavor signedFlavor : signedFlavorsList) {
                 System.out.println("=== Generated " + flavorPart + " Flavor ===");
-                System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(flavor));
+                System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(signedFlavor));
 
                 Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem");
-                TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, flavor);
+                TrustReport report = verifier.verify(hostManifest, signedFlavor);
                 System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
                 System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
             }            
