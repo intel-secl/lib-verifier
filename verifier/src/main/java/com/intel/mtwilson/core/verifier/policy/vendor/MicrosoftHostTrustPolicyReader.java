@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.intel.mtwilson.core.flavor.common.FlavorPart.*;
-
 /**
  * Trust Policy for Microsoft Platform(Host) with TPM 1.2 and 2.0 chip
  *
@@ -30,13 +28,17 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
     private final Flavor flavor;
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
-    private final SignedFlavor flavorAndSignature;
+    private final String flavorSigningCertificatePath;
+    private final Boolean skipFlavorSignatureVerification;
+    private final SignedFlavor signedFlavor;
 
-    public MicrosoftHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavor = flavorAndSignature.getFlavor();
+    public MicrosoftHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorSignatureVerification) {
+        this.flavor = signedFlavor.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
-        this.flavorAndSignature = flavorAndSignature;
+        this.flavorSigningCertificatePath = flavorSigningCertificatePath;
+        this.signedFlavor = signedFlavor;
+        this.skipFlavorSignatureVerification = skipFlavorSignatureVerification;
     }
 
     @Override
@@ -62,7 +64,9 @@ public class MicrosoftHostTrustPolicyReader implements VendorTrustPolicyReader {
                 trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
                 break;
         }
-        trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(flavorAndSignature, flavortype));
+        if (!skipFlavorSignatureVerification) {
+            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath));
+        }
         return new Policy("Microsoft Host Trust Policy", trustrules);
     }
 

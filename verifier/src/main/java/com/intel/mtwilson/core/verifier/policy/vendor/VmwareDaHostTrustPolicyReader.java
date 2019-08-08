@@ -15,8 +15,8 @@ import java.util.Set;
 
 public class VmwareDaHostTrustPolicyReader extends VmwareHostTrustPolicyReader {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VmwareDaHostTrustPolicyReader.class);
-    public VmwareDaHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        super(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath);
+    public VmwareDaHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorVerify) {
+        super(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorVerify);
     }
 
     @Override

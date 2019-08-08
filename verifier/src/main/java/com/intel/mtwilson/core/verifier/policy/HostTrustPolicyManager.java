@@ -27,17 +27,17 @@ public class HostTrustPolicyManager {
     private final Map<String, VendorTrustPolicyReader> vendorFactoryMap = new HashMap();
     Flavor flavor;
     HostManifest hostManifest;
-    SignedFlavor flavorAndSignature;
+    SignedFlavor signedFlavor;
 
-    public HostTrustPolicyManager(SignedFlavor flavorAndSignature, HostManifest hostManifest, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavorAndSignature = flavorAndSignature;
+    public HostTrustPolicyManager(SignedFlavor signedFlavor, HostManifest hostManifest, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorSignatureVerification) {
+        this.signedFlavor = signedFlavor;
         this.hostManifest = hostManifest;
-        vendorFactoryMap.put("intel", new IntelHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
-        vendorFactoryMap.put("intel-da", new IntelTpmDaHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
-        vendorFactoryMap.put("microsoft", new MicrosoftHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
-        vendorFactoryMap.put("microsoft-da", new MicrosoftHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
-        vendorFactoryMap.put("vmware", new VmwareHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
-        vendorFactoryMap.put("vmware-da", new VmwareDaHostTrustPolicyReader(flavorAndSignature, privacyCaCertificatepath, assetTagCaCertificatepath));
+        vendorFactoryMap.put("intel", new IntelHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
+        vendorFactoryMap.put("intel-da", new IntelTpmDaHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
+        vendorFactoryMap.put("microsoft", new MicrosoftHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
+        vendorFactoryMap.put("microsoft-da", new MicrosoftHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
+        vendorFactoryMap.put("vmware", new VmwareHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
+        vendorFactoryMap.put("vmware-da", new VmwareDaHostTrustPolicyReader(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification));
     }
 
     /**

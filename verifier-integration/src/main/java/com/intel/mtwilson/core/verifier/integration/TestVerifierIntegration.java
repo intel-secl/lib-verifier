@@ -21,10 +21,18 @@ import com.intel.mtwilson.core.host.connector.intel.MicrosoftHostConnectorFactor
 import com.intel.mtwilson.core.host.connector.vmware.VmwareHostConnectorFactory;
 import com.intel.mtwilson.jaxrs2.provider.JacksonObjectMapperProvider;
 import com.intel.mtwilson.core.common.model.HostManifest;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import com.intel.mtwilson.core.verifier.Verifier;
 import com.intel.mtwilson.core.verifier.policy.TrustReport;
 import com.intel.mtwilson.core.common.tag.model.X509AttributeCertificate;
+import com.intel.mtwilson.util.crypto.keystore.PrivateKeyStore;
+
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.util.List;
 
 /**
@@ -48,6 +56,9 @@ public class TestVerifierIntegration {
 
     @Integration
     public void testGenerateTrustReport(String hostConnectionString) throws IOException, Exception {
+        FileInputStream keystoreFIS = new FileInputStream("/root/mtwilson-flavor-signing-cert.p12");
+        PrivateKeyStore privateKeyStore = new PrivateKeyStore("PKCS12", new File("/root/mtwilson-flavor-signing-cert.p12"), "H6mpW8iKFOzytOFoAquvbw==".toCharArray());
+        PrivateKey privateKey = privateKeyStore.getPrivateKey("flavor-signing-key");
 
         HostConnectorFactory factory = new HostConnectorFactory();
         HostConnector hostConnector = factory.getHostConnector(hostConnectionString, tlsPolicy);
@@ -59,17 +70,18 @@ public class TestVerifierIntegration {
         PlatformFlavor platformFlavor = flavorFactory.getPlatformFlavor(hostManifest, tagCer);
 
         for(String flavorPart: platformFlavor.getFlavorPartNames()) {
-            List<SignedFlavor> signedFlavorsList = platformFlavor.getFlavorPartWithSignature(flavorPart);
+            List<SignedFlavor> signedFlavorsList = platformFlavor.getFlavorPartWithSignature(flavorPart, (PrivateKey)privateKey);
             for (SignedFlavor signedFlavor : signedFlavorsList) {
                 System.out.println("=== Generated " + flavorPart + " Flavor ===");
                 System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(signedFlavor));
 
-                Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem");
-                TrustReport report = verifier.verify(hostManifest, signedFlavor);
+                Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem", "/root/flavor-signer.crt.pem");
+                TrustReport report = verifier.verify(hostManifest, signedFlavor, false);
                 System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
                 System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
             }            
         }
+        keystoreFIS.close();
     }
     
 }

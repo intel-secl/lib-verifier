@@ -19,8 +19,6 @@ import java.util.*;
 
 import static com.intel.mtwilson.core.verifier.policy.utils.FlavorUtils.isTbootInstalled;
 
-import static com.intel.mtwilson.core.flavor.common.FlavorPart.*;
-
 /**
  * Trust Policy for Intel DA Platform(Host) with TPM 2.0 chip
  *
@@ -36,13 +34,17 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
     private final Flavor flavor;
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
-    private final SignedFlavor flavorAndSignature;
+    private final String flavorSigningCertificatePath;
+    private final Boolean skipFlavorSignatureVerification;
+    private final SignedFlavor signedFlavor;
 
-    public IntelTpmDaHostTrustPolicyReader(SignedFlavor flavorAndSignature, String privacyCaCertificatepath, String assetTagCaCertificatepath) {
-        this.flavor = flavorAndSignature.getFlavor();
+    public IntelTpmDaHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorSignatureVerification) {
+        this.flavor = signedFlavor.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
-        this.flavorAndSignature = flavorAndSignature;
+        this.flavorSigningCertificatePath = flavorSigningCertificatePath;
+        this.signedFlavor = signedFlavor;
+        this.skipFlavorSignatureVerification = skipFlavorSignatureVerification;
     }
 
     @Override
@@ -68,7 +70,9 @@ public class IntelTpmDaHostTrustPolicyReader implements VendorTrustPolicyReader 
                 trustrules.addAll(TrustRulesHolder.loadTrustRulesForSoftware(flavor));
                 break;
         }
-        trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(flavorAndSignature, flavortype));
+        if (!skipFlavorSignatureVerification) {
+            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath));
+        }
         return new Policy("Intel Host Trust Policy", trustrules);
     }
 

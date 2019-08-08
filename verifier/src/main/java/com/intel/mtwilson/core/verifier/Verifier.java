@@ -42,10 +42,12 @@ public class Verifier {
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Verifier.class);
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
+    private final String flavorSigningCertificatePath;
     
-    public Verifier(String privacyCaCertificatepath, String assetTagCaCertificatepath) {
+    public Verifier(String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath) {
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
+        this.flavorSigningCertificatePath = flavorSigningCertificatePath;
     }
     
     /**
@@ -56,10 +58,10 @@ public class Verifier {
      * @return  TrustReport
      * @throws IOException
      */
-    public TrustReport verify(String hostManifest, String flavor, String signature) throws IOException {
+    public TrustReport verify(String hostManifest, String flavor, String signature, Boolean skipFlavorSignatureVerification) throws IOException {
         ObjectMapper mapper = JacksonObjectMapperProvider.createDefaultMapper();
         HostManifest hostManifestObj = mapper.readValue(hostManifest, HostManifest.class);
-        return verify(hostManifestObj, new SignedFlavor(mapper.readValue(flavor, Flavor.class), signature));
+        return verify(hostManifestObj, new SignedFlavor(mapper.readValue(flavor, Flavor.class), signature), skipFlavorSignatureVerification);
     }
     
     /**
@@ -69,8 +71,8 @@ public class Verifier {
      * @param signedFlavor Flavor With Signature
      * @return  TrustReport
      */
-    public TrustReport verify(HostManifest hostManifest, SignedFlavor signedFlavor) {
-        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(signedFlavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath);
+    public TrustReport verify(HostManifest hostManifest, SignedFlavor signedFlavor, Boolean skipFlavorSignatureVerification) {
+        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(signedFlavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification);
         VendorTrustPolicyReader trustpolicy = policymanager.getVendorTrustPolicyReader();
         Policy policy = trustpolicy.loadTrustRules();
         return applyPolicy(hostManifest, policy, signedFlavor.getFlavor().getMeta().getId());
@@ -102,7 +104,7 @@ public class Verifier {
      * Given a set of rules, apply them all, and combine the results into one report.
      * 
      * @param  hostManifest  
-     * @param  rules to be applied
+     * @param  rules set to be applied
      * @return  Generated TrustReport
      */
     private List<RuleResult> applyTrustRules(HostManifest hostManifest, Set<Rule> rules) {

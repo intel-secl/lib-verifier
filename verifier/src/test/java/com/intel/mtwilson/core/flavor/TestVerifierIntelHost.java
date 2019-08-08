@@ -10,11 +10,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.intel.dcsg.cpg.configuration.CommonsConfiguration;
 import com.intel.dcsg.cpg.crypto.Sha256Digest;
 import com.intel.dcsg.cpg.extensions.Extensions;
 
 import com.intel.mtwilson.core.common.model.*;
 
+import com.intel.mtwilson.core.flavor.common.PlatformFlavorUtil;
 import com.intel.mtwilson.core.flavor.model.Flavor;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.rule.PcrEventLogIntegrity;
@@ -32,14 +34,19 @@ import com.intel.mtwilson.jackson.validation.ValidationModule;
 import com.intel.mtwilson.core.common.tag.model.X509AttributeCertificate;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.intel.mtwilson.util.crypto.keystore.PrivateKeyStore;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -60,6 +67,8 @@ public class TestVerifierIntelHost {
     ObjectMapper mapper = JacksonObjectMapperProvider.createDefaultMapper();
     File tempPrivacyCA;
     File temptagCA;
+    File tempFlavorSigningCert;
+    File tempFlavorSigningKeystore;
     String hostManifestwithTagCertificateAsJson;
     GenericPlatformFlavor gpf;
 
@@ -89,16 +98,26 @@ public class TestVerifierIntelHost {
             temptagCA.setReadable(true);
         }
 
+        try (InputStream fi = this.getClass().getClassLoader().getResourceAsStream( pathPrefix + "/flavor-signer.crt.pem")) {
+            tempFlavorSigningCert = File.createTempFile("temp_flavor_signing_cert", "");
+            Files.copy(fi, tempFlavorSigningCert.toPath(), REPLACE_EXISTING);
+            tempFlavorSigningCert.setReadable(true);
+        }
+
+        try (InputStream fi = this.getClass().getClassLoader().getResourceAsStream( pathPrefix + "/mtwilson-flavor-signing-cert.p12")) {
+            tempFlavorSigningKeystore = File.createTempFile("temp_flavor_signing_keystore", "");
+            Files.copy(fi, tempFlavorSigningKeystore.toPath(), REPLACE_EXISTING);
+            tempFlavorSigningKeystore.setReadable(true);
+        }
+
         String hostManifestAsJson = Resources.toString(Resources.getResource(pathPrefix + "/RHEL_Manifest.json"), Charsets.UTF_8);
         String tagCerAsJson = Resources.toString(Resources.getResource(pathPrefix + "/tagcer.json"), Charsets.UTF_8);
 
         X509AttributeCertificate tagCer = mapper.readValue(tagCerAsJson, X509AttributeCertificate.class);
         HostManifest hostManifest = mapper.readValue(hostManifestAsJson, HostManifest.class);
-        //hostManifest.setTagCertificate(tagCer);
+
         hostManifestwithTagCertificateAsJson = mapper.writeValueAsString(hostManifest);
 
-        //PlatformFlavorFactory factory = new PlatformFlavorFactory();
-        //PlatformFlavor platformFlavor = factory.getPlatformFlavor(hostManifest, tagCer);
         gpf = new GenericPlatformFlavor("INTEL", tagCer);
     }
 
@@ -106,13 +125,19 @@ public class TestVerifierIntelHost {
     public void tearDown() {
         tempPrivacyCA.delete();
         temptagCA.delete();
+        tempFlavorSigningCert.delete();
+        tempFlavorSigningKeystore.delete();
     }
 
     @Test
     public void testTrustReportResults() throws Exception {
+        PrivateKeyStore privateKeyStore = new PrivateKeyStore("PKCS12", new File(tempFlavorSigningKeystore.getPath()), "H6mpW8iKFOzytOFoAquvbw==".toCharArray());
+        PrivateKey privateKey = privateKeyStore.getPrivateKey("flavor-signing-key");
         for(String flavorPart: gpf.getFlavorPartNames()) {
-            Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath());
-            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, gpf.getFlavorPartWithSignature(flavorPart).get(0).getFlavor().toString(), gpf.getFlavorPartWithSignature(flavorPart).get(0).getSignature());
+            Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath(), tempFlavorSigningCert.getPath());
+
+            TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, Flavor.serialize(gpf.getFlavorPartWithSignature(flavorPart, (PrivateKey)privateKey).get(0).getFlavor()),
+                    gpf.getFlavorPartWithSignature(flavorPart, (PrivateKey)privateKey).get(0).getSignature(), false);
 
             System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));
 

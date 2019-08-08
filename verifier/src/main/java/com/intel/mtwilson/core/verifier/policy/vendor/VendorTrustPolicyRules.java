@@ -241,10 +241,10 @@ public class VendorTrustPolicyRules {
         return createRulesFromPcrList("PcrMatchesConstant", pcrList, pcrIndexList, markers);
     }
 
-    public static Set<Rule> createFlavorIntegrityRules(SignedFlavor flavorAndSignature, String flavorType) {
+    public static Set<Rule> createFlavorIntegrityRules(SignedFlavor signedFlavor, String flavorType, String flavorSigningCertPath) {
         log.debug("Creating Flavor Integrity trust rules");
         HashSet<Rule> rules = new HashSet<>();
-        FlavorTrusted flavorTrusted = new FlavorTrusted(flavorAndSignature);
+        FlavorTrusted flavorTrusted = new FlavorTrusted(signedFlavor, flavorSigningCertPath);
         flavorTrusted.setMarkers(flavorType);
         rules.add(flavorTrusted);
         return rules;

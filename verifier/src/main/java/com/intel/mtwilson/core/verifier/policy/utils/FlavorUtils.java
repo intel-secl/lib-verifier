@@ -29,9 +29,9 @@ public class FlavorUtils {
         return flavor.getMeta().getDescription().getTbootInstalled() == null || Boolean.valueOf(flavor.getMeta().getDescription().getTbootInstalled());
     }
 
-    public static boolean verifyFlavorSignature(String flavor, String signatureString) {
+    public static boolean verifyFlavorSignature(String flavor, String signatureString, String flavorSigningCertPath) {
         boolean isVerified;
-        try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile("/opt/mtwilson/configuration/flavor-signer.crt.pem"))) {
+        try (InputStream privacyCaIn = new FileInputStream(ResourceFinder.getFile(flavorSigningCertPath))) {
             List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(privacyCaIn));
             Signature signature = Signature.getInstance("SHA384withRSA");
             signature.initVerify(flavorSigningCertificates.get(0));
