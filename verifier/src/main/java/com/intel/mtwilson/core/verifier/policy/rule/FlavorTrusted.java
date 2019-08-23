@@ -34,15 +34,19 @@ public class FlavorTrusted extends BaseRule {
         try {
             if (signedFlavor.getSignature() == null || signedFlavor.getSignature().isEmpty()) {
                 report.fault(new FlavorSignatureMissing(signedFlavor.getFlavor()));
-                report.setFlavorId(signedFlavor.getFlavor().getMeta().getId());
             } else if (!FlavorUtils.verifyFlavorSignature(Flavor.serialize(signedFlavor.getFlavor()), signedFlavor.getSignature(), flavorSigningCertPath)) {
                 report.fault(new FlavorSignatureNotTrusted(signedFlavor.getFlavor()));
-                report.setFlavorId(signedFlavor.getFlavor().getMeta().getId());
             }
         } catch (JsonProcessingException exc) {
             report.fault(exc.getMessage(), new FlavorSignatureVerificationFailed(signedFlavor.getFlavor()));
-            report.setFlavorId(signedFlavor.getFlavor().getMeta().getId());
         }
+        report.setFlavorId(signedFlavor.getFlavor().getMeta().getId());
         return report;
     }
+
+    @Override
+    public String toString() {
+        return "Flavor is signed by trusted authority";
+    }
+
 }
