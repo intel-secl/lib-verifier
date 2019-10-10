@@ -85,6 +85,7 @@ public class HostTrustPolicyManager {
     private static String getVendorName(HostInfo hostInfo) {
         String vendor;
         switch (hostInfo.getOsName().trim().toUpperCase()) {
+            case "REDHATENTERPRISE":
             case "REDHATENTERPRISESERVER":
             case "RHEL":
             case "UBUNTU":
