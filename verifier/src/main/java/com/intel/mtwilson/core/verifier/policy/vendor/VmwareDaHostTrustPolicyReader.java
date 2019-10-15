@@ -4,7 +4,6 @@
  */
 package com.intel.mtwilson.core.verifier.policy.vendor;
 
-import com.intel.mtwilson.core.flavor.model.Flavor;
 import com.intel.mtwilson.core.flavor.model.SignedFlavor;
 import com.intel.mtwilson.core.verifier.policy.Rule;
 import com.intel.mtwilson.core.verifier.policy.TrustMarker;
@@ -15,8 +14,8 @@ import java.util.Set;
 
 public class VmwareDaHostTrustPolicyReader extends VmwareHostTrustPolicyReader {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VmwareDaHostTrustPolicyReader.class);
-    public VmwareDaHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorVerify) {
-        super(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorVerify);
+    public VmwareDaHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, String flavorCaCertPath, Boolean skipFlavorVerify) {
+        super(signedFlavor, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, flavorCaCertPath, skipFlavorVerify);
     }
 
     @Override

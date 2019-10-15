@@ -28,13 +28,10 @@ import com.intel.mtwilson.jackson.validation.ValidationModule;
 import com.intel.mtwilson.core.common.tag.model.X509AttributeCertificate;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import java.security.Key;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.Map.Entry;
 
@@ -60,6 +57,7 @@ public class TestVerifierEsxiHost {
     File tempPrivacyCA;
     File temptagCA;
     File tempFlavorSigningCert;
+    File flavorCaCertPath;
     File tempFlavorSigningKeystore;
     String hostManifestwithTagCertificateAsJson;
     SignedFlavor assetTagFlavor;
@@ -96,6 +94,12 @@ public class TestVerifierEsxiHost {
             tempFlavorSigningCert.setReadable(true);
         }
 
+        try (InputStream fi = this.getClass().getClassLoader().getResourceAsStream( pathPrefix + "/cms-ca.crt.pem")) {
+            flavorCaCertPath = File.createTempFile("temp_cam_ca_cert", "");
+            Files.copy(fi, flavorCaCertPath.toPath(), REPLACE_EXISTING);
+            flavorCaCertPath.setReadable(true);
+        }
+
         try (InputStream fi = this.getClass().getClassLoader().getResourceAsStream( pathPrefix + "/mtwilson-flavor-signing-cert.p12")) {
             tempFlavorSigningKeystore = File.createTempFile("temp_flavor_signing_keystore", "");
             Files.copy(fi, tempFlavorSigningKeystore.toPath(), REPLACE_EXISTING);
@@ -120,12 +124,13 @@ public class TestVerifierEsxiHost {
         tempPrivacyCA.delete();
         temptagCA.delete();
         tempFlavorSigningCert.delete();
+        flavorCaCertPath.delete();
         tempFlavorSigningKeystore.delete();
     }
 
     @Test
     public void testTrustReportResults() throws Exception {
-        Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath(), tempFlavorSigningCert.getPath());
+        Verifier verifier = new Verifier(tempPrivacyCA.getPath(), temptagCA.getPath(), tempFlavorSigningCert.getPath(), flavorCaCertPath.getPath());
         TrustReport report = verifier.verify(hostManifestwithTagCertificateAsJson, Flavor.serialize(assetTagFlavor.getFlavor()), assetTagFlavor.getSignature(), true);
         
         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));

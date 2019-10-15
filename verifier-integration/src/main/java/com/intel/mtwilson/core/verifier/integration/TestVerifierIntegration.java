@@ -30,8 +30,6 @@ import com.intel.mtwilson.core.verifier.policy.TrustReport;
 import com.intel.mtwilson.core.common.tag.model.X509AttributeCertificate;
 import com.intel.mtwilson.util.crypto.keystore.PrivateKeyStore;
 
-import java.security.Key;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.List;
 
@@ -75,7 +73,7 @@ public class TestVerifierIntegration {
                 System.out.println("=== Generated " + flavorPart + " Flavor ===");
                 System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(signedFlavor));
 
-                Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem", "/root/flavor-signer.crt.pem");
+                Verifier verifier = new Verifier("/root/PrivacyCA.pem", "/root/tag-cacerts.pem", "/root/flavor-signer.crt.pem", "/root/cms-ca.crt.pem");
                 TrustReport report = verifier.verify(hostManifest, signedFlavor, false);
                 System.out.println("=== Generated Trust Report for " + flavorPart + " ===");
                 System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report));

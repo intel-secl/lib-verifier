@@ -35,9 +35,9 @@ public class TrustRulesHolder {
         return rules;
     }
 
-    public static Set<Rule> loadFlavorIntegrityTrustRules(SignedFlavor signedFlavor, String flavorType, String flavorSigningCertPath) {
+    public static Set<Rule> loadFlavorIntegrityTrustRules(SignedFlavor signedFlavor, String flavorType, String flavorSigningCertPath, String flavorCaCertPath) {
         HashSet<Rule> rules = new HashSet<>();
-        Set<Rule> flavorIntegrityRules = VendorTrustPolicyRules.createFlavorIntegrityRules(signedFlavor, flavorType, flavorSigningCertPath);
+        Set<Rule> flavorIntegrityRules = VendorTrustPolicyRules.createFlavorIntegrityRules(signedFlavor, flavorType, flavorSigningCertPath, flavorCaCertPath);
         rules.addAll(flavorIntegrityRules);
         log.debug("Created Trust rules for FLAVOR_INTEGRITY");
         return rules;

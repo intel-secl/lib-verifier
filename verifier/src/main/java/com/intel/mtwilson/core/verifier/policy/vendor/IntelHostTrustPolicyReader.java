@@ -29,14 +29,16 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
     protected final String flavorSigningCertificatePath;
+    protected final String flavorCaCertPath;
     private final Boolean skipFlavorSignatureVerification;
     private final SignedFlavor signedFlavor;
 
-    public IntelHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorSignatureVerification) {
+    public IntelHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, String flavorCaCertPath, Boolean skipFlavorSignatureVerification) {
         this.flavor = signedFlavor.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
         this.flavorSigningCertificatePath = flavorSigningCertificatePath;
+        this.flavorCaCertPath = flavorCaCertPath;
         this.signedFlavor = signedFlavor;
         this.skipFlavorSignatureVerification = skipFlavorSignatureVerification;
     }
@@ -65,7 +67,7 @@ public class IntelHostTrustPolicyReader implements VendorTrustPolicyReader {
                 break;
         }
         if (!skipFlavorSignatureVerification) {
-            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath));
+            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath, flavorCaCertPath));
         }
         return new Policy("Intel Host Trust Policy", trustrules);
     }

@@ -5,7 +5,6 @@
 package com.intel.mtwilson.core.verifier;
 
 import com.intel.mtwilson.core.flavor.model.SignedFlavor;
-import com.intel.mtwilson.core.verifier.policy.utils.FlavorUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intel.mtwilson.jaxrs2.provider.JacksonObjectMapperProvider;
@@ -43,11 +42,13 @@ public class Verifier {
     private final String privacyCaCertificatepath;
     private final String assetTagCaCertificatepath;
     private final String flavorSigningCertificatePath;
-    
-    public Verifier(String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath) {
+    private final String flavorCaCertPath;
+
+    public Verifier(String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, String flavorCaCertPath) {
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
         this.flavorSigningCertificatePath = flavorSigningCertificatePath;
+        this.flavorCaCertPath = flavorCaCertPath;
     }
     
     /**
@@ -72,7 +73,7 @@ public class Verifier {
      * @return  TrustReport
      */
     public TrustReport verify(HostManifest hostManifest, SignedFlavor signedFlavor, Boolean skipFlavorSignatureVerification) {
-        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(signedFlavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, skipFlavorSignatureVerification);
+        HostTrustPolicyManager policymanager = new HostTrustPolicyManager(signedFlavor, hostManifest, privacyCaCertificatepath, assetTagCaCertificatepath, flavorSigningCertificatePath, flavorCaCertPath, skipFlavorSignatureVerification);
         VendorTrustPolicyReader trustpolicy = policymanager.getVendorTrustPolicyReader();
         Policy policy = trustpolicy.loadTrustRules();
         return applyPolicy(hostManifest, policy, signedFlavor.getFlavor().getMeta().getId());

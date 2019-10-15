@@ -24,12 +24,14 @@ public class FlavorTrusted extends BaseRule {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(FlavorTrusted.class);
     private SignedFlavor signedFlavor;
     private String flavorSigningCertPath;
+    private String flavorCaCertPath;
 
     protected FlavorTrusted(){}
 
-    public FlavorTrusted(SignedFlavor signedFlavor, String flavorSigningCertPath) {
+    public FlavorTrusted(SignedFlavor signedFlavor, String flavorSigningCertPath, String flavorCaCertPath) {
         this.signedFlavor = signedFlavor;
         this.flavorSigningCertPath = flavorSigningCertPath;
+        this.flavorCaCertPath = flavorCaCertPath;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class FlavorTrusted extends BaseRule {
         try {
             if (signedFlavor.getSignature() == null || signedFlavor.getSignature().isEmpty()) {
                 report.fault(new FlavorSignatureMissing(signedFlavor.getFlavor()));
-            } else if (!FlavorUtils.verifyFlavorSignature(Flavor.serialize(signedFlavor.getFlavor()), signedFlavor.getSignature(), flavorSigningCertPath)) {
+            } else if (!FlavorUtils.verifyFlavorTrust(Flavor.serialize(signedFlavor.getFlavor()), signedFlavor.getSignature(), flavorSigningCertPath, flavorCaCertPath)) {
                 report.fault(new FlavorSignatureNotTrusted(signedFlavor.getFlavor()));
             }
         } catch (JsonProcessingException exc) {

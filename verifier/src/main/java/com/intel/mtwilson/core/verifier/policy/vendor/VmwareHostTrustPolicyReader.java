@@ -29,15 +29,17 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
     protected final String privacyCaCertificatepath; //TODO(dtiwari): Remove this variable as it is not being used like other Vendors ?
     protected final String assetTagCaCertificatepath;
     protected final String flavorSigningCertificatePath;
+    protected final String flavorCaCertPath;
     private final Boolean skipFlavorSignatureVerification;
     private final SignedFlavor signedFlavor;
 
 
-    public VmwareHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, Boolean skipFlavorSignatureVerification) {
+    public VmwareHostTrustPolicyReader(SignedFlavor signedFlavor, String privacyCaCertificatepath, String assetTagCaCertificatepath, String flavorSigningCertificatePath, String flavorCaCertPath, Boolean skipFlavorSignatureVerification) {
         this.flavor = signedFlavor.getFlavor();
         this.privacyCaCertificatepath = privacyCaCertificatepath;
         this.assetTagCaCertificatepath = assetTagCaCertificatepath;
         this.flavorSigningCertificatePath = flavorSigningCertificatePath;
+        this.flavorCaCertPath = flavorCaCertPath;
         this.signedFlavor = signedFlavor;
         this.skipFlavorSignatureVerification = skipFlavorSignatureVerification;
 
@@ -67,7 +69,7 @@ public class VmwareHostTrustPolicyReader implements VendorTrustPolicyReader {
                 break;
         }
         if (!skipFlavorSignatureVerification) {
-            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath));
+            trustrules.addAll(TrustRulesHolder.loadFlavorIntegrityTrustRules(signedFlavor, flavortype, flavorSigningCertificatePath, flavorCaCertPath));
         }
         return new Policy("VMware Host Trust Policy", trustrules);
     }
