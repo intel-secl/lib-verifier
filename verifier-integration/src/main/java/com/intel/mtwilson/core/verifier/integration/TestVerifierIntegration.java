@@ -53,13 +53,13 @@ public class TestVerifierIntegration {
     }
 
     @Integration
-    public void testGenerateTrustReport(String hostConnectionString) throws IOException, Exception {
+    public void testGenerateTrustReport(String hostConnectionString, String aasApiUrl) throws IOException, Exception {
         FileInputStream keystoreFIS = new FileInputStream("/root/mtwilson-flavor-signing-cert.p12");
         PrivateKeyStore privateKeyStore = new PrivateKeyStore("PKCS12", new File("/root/mtwilson-flavor-signing-cert.p12"), "H6mpW8iKFOzytOFoAquvbw==".toCharArray());
         PrivateKey privateKey = privateKeyStore.getPrivateKey("flavor-signing-key");
 
         HostConnectorFactory factory = new HostConnectorFactory();
-        HostConnector hostConnector = factory.getHostConnector(hostConnectionString, tlsPolicy);
+        HostConnector hostConnector = factory.getHostConnector(hostConnectionString, aasApiUrl, tlsPolicy);
         HostManifest hostManifest = hostConnector.getHostManifest();
         ObjectMapper mapper = JacksonObjectMapperProvider.createDefaultMapper();
         String tagCerAsJson = Resources.toString(Resources.getResource("tagcer.json"), Charsets.UTF_8);
