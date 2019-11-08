@@ -21,12 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Note: passing policy name instead of policy itself because do not want to just "return policy", 
+ * Note: passing policy name instead of policy itself because do not want to just "return policy",
  * since that will have all the same information that you already get in the reports, and anything
  * that serializes this class would then show redundant info.  Every rule result already includes
  * the rule itself, and since there is a result for every rule in the policy,  the entire policy
  * is represented by the set of rule results.
- * 
+ *
  * The host manifest is also included, which is somewhat redundant but not completely, because it
  * has information that may not be present in the rules, which the UI may want to show. For example,
  * for vmware PCR 19 which has a different value for every host due to a host-specific UUID
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * say what is the PCR value (and if it did, it would show the expected PCR, not the actual PCR).
  * Also if module names mismatch even though their digests are the same, that wouldn't normally
  * be reflected in the results.
- * 
+ *
  * @author jbuhacoff
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -45,25 +45,25 @@ public class TrustReport {
     private String policyName;
     private ArrayList<RuleResult> results = new ArrayList<RuleResult>();
     private Logger log = LoggerFactory.getLogger(getClass());
-    
+
     public TrustReport() { } // for desearializing jackson
-    
+
     public TrustReport(HostManifest hostManifest, String policyName) {
         this.hostManifest = hostManifest;
         this.policyName = policyName;
     }
-    
+
     public HostManifest getHostManifest() { return hostManifest; }
     public String getPolicyName() { return policyName; }
-    
+
     public void addResult(RuleResult result)  {
         if (!checkResultExists(result)){
             results.add(result);
         }
     }
-    
+
     public List<RuleResult> getResults() { return results; } // contains the set of rules and their parameters AND faults AND isTrusted for each one
- 
+
     private boolean isTrustedForResults(List<RuleResult> list) {
         if( list.isEmpty() ) {
             return false; // empty policy is not trusted;  like RequireAllEmptySet fault.
@@ -74,13 +74,13 @@ public class TrustReport {
             RuleResult result = it.next();
             trusted = trusted && result.isTrusted();
         }
-        return trusted;        
+        return trusted;
     }
-    
+
     public boolean isTrusted() {
         return isTrustedForResults(results);
     }
-    
+
     // returns a list of trust reports corresponding to the specified marker
     // they are already included in the overall "getReports" but this allows
     // you to look specifically at what caused a specific marker to be trusted
@@ -98,22 +98,30 @@ public class TrustReport {
         }
         return markerReports;
     }
-    
+
     public boolean isTrustedForMarker(String marker) {
         return isTrustedForResults(getResultsForMarker(marker));
     }
-    
+
     public boolean checkResultExists(RuleResult result) {
         String marker = result.getRule().getMarkers()[0];
         List<RuleResult> combinedRuleResults = this.getResultsForMarker(marker);
         for (RuleResult ruleResult : combinedRuleResults) {
             if (result.equals(ruleResult)) {
+                if (result.getRule() instanceof PcrRule) {
+                    PcrRule pcrRule = (PcrRule) result.getRule();
+                    PcrRule pcrRuleResult = (PcrRule) ruleResult.getRule();
+                    if (pcrRule.getExpectedPcr() == null || (pcrRule.getExpectedPcr() != null && pcrRule.getExpectedPcr().getIndex() != null &&
+                            !pcrRule.getExpectedPcr().getIndex().equals(pcrRuleResult.getExpectedPcr().getIndex()))) {
+                        return false;
+                    }
+                }
                 return true;
             }
         }
         return false;
     }
-    
+
     @JsonIgnore
     public int getFaultsCount() {
         int faultsCount = 0;
@@ -122,7 +130,7 @@ public class TrustReport {
         }
         return faultsCount;
     }
-    
+
     @JsonIgnore
     public Map<String, String> getTags() {
         Map<String, String> tags = new HashMap();

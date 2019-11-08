@@ -13,7 +13,7 @@ import com.intel.dcsg.cpg.crypto.Sha1Digest;
 import com.intel.dcsg.cpg.crypto.Sha256Digest;
 
 import com.intel.mtwilson.core.common.model.*;
-import com.intel.mtwilson.core.verifier.policy.BaseRule;
+import com.intel.mtwilson.core.verifier.policy.PcrRule;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogInvalid;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogMissing;
@@ -44,11 +44,10 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PcrEventLogIntegrity extends BaseRule {
+public class PcrEventLogIntegrity extends PcrRule {
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PcrEventLogIntegrity.class);
     private DigestAlgorithm pcrBank;
     protected PcrIndex pcrIndex;
-    protected Pcr expected;
 
     protected PcrEventLogIntegrity() {
     } // for desearializing jackson
@@ -56,10 +55,6 @@ public class PcrEventLogIntegrity extends BaseRule {
     public PcrEventLogIntegrity(Pcr expected) {
         this.expected = expected;
         this.pcrIndex = expected.getIndex();
-    }    
-    
-    public Pcr getExpected() {
-        return expected;
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.intel.mtwilson.core.verifier.policy.BaseRule;
+import com.intel.mtwilson.core.verifier.policy.PcrRule;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrManifestMissing;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrValueMismatch;
@@ -30,15 +30,12 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class PcrMatchesConstant extends BaseRule {
-    private final Pcr expected;
+public class PcrMatchesConstant extends PcrRule {
     
     @JsonCreator
     public PcrMatchesConstant(@JsonProperty("expected_pcr") Pcr expected) {
         this.expected = expected;
     }
-    
-    public Pcr getExpectedPcr() { return expected; }
     
     @Override
     public RuleResult apply(HostManifest hostManifest) {
