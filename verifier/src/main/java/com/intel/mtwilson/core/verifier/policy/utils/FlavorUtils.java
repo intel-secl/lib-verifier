@@ -65,6 +65,7 @@ public class FlavorUtils {
     private static X509Certificate getFlavorSigningCertificate(String flavorSigningCertPath) throws IOException, CertificateException {
         InputStream signingCert = new FileInputStream(ResourceFinder.getFile(flavorSigningCertPath));
         List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
+        signingCert.close();
         return flavorSigningCertificates.get(0);
     }
 
@@ -73,6 +74,7 @@ public class FlavorUtils {
         InputStream signingCert = new FileInputStream(ResourceFinder.getFile(flavorSigningCertPath));
         List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
         intermediateCas.add(flavorSigningCertificates.get(1));
+        signingCert.close();
         return intermediateCas;
     }
 
@@ -81,6 +83,7 @@ public class FlavorUtils {
         InputStream rootCert = new FileInputStream(ResourceFinder.getFile(rootCaPath));
         List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(rootCert));
         intermediateCas.add(flavorSigningCertificates.get(0));
+        rootCert.close();
         return intermediateCas;
     }
 }
