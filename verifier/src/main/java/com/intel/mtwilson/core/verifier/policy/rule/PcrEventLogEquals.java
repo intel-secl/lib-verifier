@@ -7,7 +7,7 @@ package com.intel.mtwilson.core.verifier.policy.rule;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.intel.mtwilson.core.verifier.policy.BaseRule;
+import com.intel.mtwilson.core.verifier.policy.PcrRule;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogContainsUnexpectedEntries;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogMissing;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PcrEventLogEquals extends BaseRule {
+public class PcrEventLogEquals extends PcrRule {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private PcrEventLog expected;
@@ -48,7 +48,7 @@ public class PcrEventLogEquals extends BaseRule {
         this.expected = expected;
     }
 
-    public PcrEventLog getPcrModuleManifest() {
+    public PcrEventLog getExpected() {
         return expected;
     }
 

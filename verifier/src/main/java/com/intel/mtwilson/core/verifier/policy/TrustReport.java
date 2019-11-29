@@ -111,8 +111,8 @@ public class TrustReport {
                 if (result.getRule() instanceof PcrRule) {
                     PcrRule pcrRule = (PcrRule) result.getRule();
                     PcrRule pcrRuleResult = (PcrRule) ruleResult.getRule();
-                    if (pcrRule.getExpectedPcr() == null || (pcrRule.getExpectedPcr() != null && pcrRule.getExpectedPcr().getIndex() != null &&
-                            !pcrRule.getExpectedPcr().getIndex().equals(pcrRuleResult.getExpectedPcr().getIndex()))) {
+                    if (pcrRule.getExpectedPcr() == null || (pcrRule.getExpectedPcr() != null &&
+                            !pcrRule.getExpectedPcr().equals(pcrRuleResult.getExpectedPcr()))) {
                         return false;
                     }
                 }

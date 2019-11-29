@@ -49,7 +49,7 @@ public class PcrEventLogEqualsExcluding extends PcrEventLogEquals {
 
     @Override
     protected PcrEventLog getPcrEventLog(HostManifest hostManifest) {
-        PcrEventLog eventLog = hostManifest.getPcrManifest().getPcrEventLog(getPcrModuleManifest().getPcrBank(), getPcrModuleManifest().getPcrIndex());
+        PcrEventLog eventLog = hostManifest.getPcrManifest().getPcrEventLog(getExpected().getPcrBank(), getExpected().getPcrIndex());
         List<Measurement> modules;
         if(eventLog != null) {
              modules = eventLog.getEventLog();
@@ -77,7 +77,7 @@ public class PcrEventLogEqualsExcluding extends PcrEventLogEquals {
             // Add the module to be verified.
             modulesExcluding.add(measurement);
         }
-        PcrEventLog updatedPcrEventLog = PcrEventLogFactory.newInstance(getPcrModuleManifest().getPcrBank(), getPcrModuleManifest().getPcrIndex(), modulesExcluding);
+        PcrEventLog updatedPcrEventLog = PcrEventLogFactory.newInstance(getExpected().getPcrBank(), getExpected().getPcrIndex(), modulesExcluding);
         return updatedPcrEventLog; // the new instance 
     }
 }
