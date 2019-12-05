@@ -64,26 +64,36 @@ public class FlavorUtils {
 
     private static X509Certificate getFlavorSigningCertificate(String flavorSigningCertPath) throws IOException, CertificateException {
         InputStream signingCert = new FileInputStream(ResourceFinder.getFile(flavorSigningCertPath));
-        List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
-        signingCert.close();
+        List<X509Certificate> flavorSigningCertificates;
+        try {
+            flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
+        } finally {
+            signingCert.close();
+        }
         return flavorSigningCertificates.get(0);
     }
 
     private static ArrayList<Certificate> getIntermediateCas(String flavorSigningCertPath) throws IOException, CertificateException {
         ArrayList<Certificate> intermediateCas = new ArrayList<>();
         InputStream signingCert = new FileInputStream(ResourceFinder.getFile(flavorSigningCertPath));
-        List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
-        intermediateCas.add(flavorSigningCertificates.get(1));
-        signingCert.close();
+        try {
+            List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(signingCert));
+            intermediateCas.add(flavorSigningCertificates.get(1));
+        } finally {
+            signingCert.close();
+        }
         return intermediateCas;
     }
 
     private static ArrayList<Certificate> getRootCas(String rootCaPath) throws IOException, CertificateException {
         ArrayList <Certificate> intermediateCas = new ArrayList<>();
         InputStream rootCert = new FileInputStream(ResourceFinder.getFile(rootCaPath));
-        List<X509Certificate> flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(rootCert));
-        intermediateCas.add(flavorSigningCertificates.get(0));
-        rootCert.close();
+        try {
+            List<X509Certificate>  flavorSigningCertificates = X509Util.decodePemCertificates(IOUtils.toString(rootCert));
+            intermediateCas.add(flavorSigningCertificates.get(0));
+        } finally {
+            rootCert.close();
+        }
         return intermediateCas;
     }
 }
