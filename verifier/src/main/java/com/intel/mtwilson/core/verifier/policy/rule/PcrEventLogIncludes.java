@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import com.intel.dcsg.cpg.crypto.DigestAlgorithm;
 
-import com.intel.mtwilson.core.verifier.policy.BaseRule;
+import com.intel.mtwilson.core.verifier.policy.PcrRule;
 import com.intel.mtwilson.core.verifier.policy.RuleResult;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogMissing;
 import com.intel.mtwilson.core.verifier.policy.fault.PcrEventLogMissingExpectedEntries;
@@ -36,7 +36,7 @@ import java.util.Set;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PcrEventLogIncludes extends BaseRule {
+public class PcrEventLogIncludes extends PcrRule {
     protected DigestAlgorithm pcrBank;
     protected PcrIndex pcrIndex;
     protected Set<Measurement> expected;
