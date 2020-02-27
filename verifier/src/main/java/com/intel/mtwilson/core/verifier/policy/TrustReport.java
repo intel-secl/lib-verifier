@@ -111,10 +111,14 @@ public class TrustReport {
                 if (result.getRule() instanceof PcrRule) {
                     PcrRule pcrRule = (PcrRule) result.getRule();
                     PcrRule pcrRuleResult = (PcrRule) ruleResult.getRule();
-                    if (pcrRule.getExpectedPcr() == null || (pcrRule.getExpectedPcr() != null &&
-                            !pcrRule.getExpectedPcr().equals(pcrRuleResult.getExpectedPcr()))) {
+                    if (pcrRule.getExpectedPcr() == null || (pcrRule.getExpectedPcr() != null
+                            && !pcrRule.getExpectedPcr().equals(pcrRuleResult.getExpectedPcr()))) {
                         return false;
                     }
+                }
+                // check if faults are present or flavorid is null (when manifest is removed | fix for 8752)
+                else if (result.getFaults().size() > 0 || result.getFlavorId() == null) {
+                    return false;
                 }
                 return true;
             }
